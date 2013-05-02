@@ -42,13 +42,16 @@ private:
     
     bool active;
     Db* db;
-    uint queue_lock_id;
+    uint locker_id;
     
-    DbLock acquire_queue_lock(const string& queue_name, const db_lockmode_t lock_mode);
-    void release_queue_lock(DbLock* lock);
+    DbLock acquire_lock(const string& lock_name, const db_lockmode_t lock_mode);
+    void release_lock(DbLock* lock);
     
     vector<string> load_queue(const string& queue_name);
-    void save_queue(const string& queue_name, const vector<string>);
+    void save_queue(const string& queue_name, const vector<string> data);
+    
+    string load_queue_raw(const string& queue_name);
+    void save_queue_raw(const string& queue_name, const string& data);
     
     unsigned long load_queue_size(const string& queue_name);
     void save_queue_size(const string& queue_name, unsigned long size);

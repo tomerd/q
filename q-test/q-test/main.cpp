@@ -81,17 +81,18 @@ void test2()
     q_connect(&q);
     
     q_worker(q, "channel1", &worker1);
-
     
-    for (uint index=0; index < 256; index++)
+    for (uint index=0; index < 1024*1024; index++)
     {
-        char* data = new char[1024];
+        char* data = new char[100];
         int w = sprintf(data, "test %d", index);
         data[w] = '\0';
         q_post(q, "channel1", data, 0);
         delete data;
     }
-            
+    
+    q_worker(q, "channel1", &worker2);
+    
     sleep(10);
     
     q_disconnect(q);
