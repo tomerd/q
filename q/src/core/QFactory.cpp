@@ -9,8 +9,10 @@
 #include "QFactory.h"
 
 #include "TransientQ.h"
+#include "BerkleyQ.h"
 
 Q* QFactory::createQ()
 {
-    return new TransientQ();
+    //return new TransientQ();
+    return new BerkleyQ();
 }

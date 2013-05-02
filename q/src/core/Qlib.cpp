@@ -14,54 +14,53 @@
 #define EXPORT __attribute__((visibility("default")))
 
 EXPORT
-char* q_version()
+const char* q_version()
 {
-    return  "0.0.1";
+    return "0.0.1";
 }
 
 EXPORT
-void q_connect(void** q)
+void q_connect(void** pq)
 {
-    *q = QFactory::createQ();
-    ((Q*)(*q))->start();
-    q_log("connected");
+    *pq = QFactory::createQ();
+    ((Q*)(*pq))->start();
 }
 
 EXPORT
 void q_disconnect(void* q)
 {
     ((Q*)q)->stop();
-    q_log("disconnected");
 }
 
 EXPORT
 const char* q_post(void* q, const char* queue, const char* data, const long at)
 {
     Job* job = ((Q*)q)->post(queue, data, at);
-    q_log("posted %s on %s (%s)", data, queue, job->uid().c_str());    
     return job->uid().c_str();
 }
 
 EXPORT
 void q_worker(void* q, const char* queue, void (*delegate)(const char**))
 {
-    q_log("registering worker for %s", queue);
-    ((Q*)q)->worker(queue, [=](Job* job, JobError** error)
+    //((Q*)q)->worker(queue, [=](Job* job, JobError** error)
+    ((Q*)q)->worker(queue, std::shared_ptr<std::function<void (Job*, JobError** error)>>(new std::function<void (Job*, JobError**)>([=](Job* job, JobError** error)
     {
+        // TODO: deal with error
         const char* data = job->data().c_str();
         delegate(&data);
-    });
+    })));
 }
 
 EXPORT
 void q_observer(void* q, const char* queue, void (*delegate)(const char**))
 {
-    q_log("registering observer on %s", queue);
-    ((Q*)q)->observer(queue, [=](Job* job, JobError** error)
+    //((Q*)q)->observer(queue, [=](Job* job, JobError** error)
+    ((Q*)q)->observer(queue, std::shared_ptr<std::function<void (Job*, JobError**)>>(new std::function<void (Job*, JobError**)>([=](Job* job, JobError** error)
     {
+        // TODO: deal with error        
         const char* data = job->data().c_str();
         delegate(&data);
-    });
+    })));
 }
 
 

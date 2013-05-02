@@ -7,26 +7,32 @@
 //
 
 #include <uuid/uuid.h>
+#include <vector>
 
 #include "Job.h"
 
-void Job::init(const string& uid, const string& data, const long at)
+string generate_job_uid();
+
+void Job::init(const string& uid, const string& data, const unsigned long at, const unsigned long timestamp)
 {
+    long now = 0;
+    time(&now);
+    
     _uid = uid;
     _data = data;
     _at = at;
-    time(&_timestamp);
+    _timestamp = timestamp > 0 ? timestamp : now;
 }
 
-Job::Job(const string& uid, const string& data, const long at)
+Job::Job(const string& uid, const string& data, const unsigned long at, const unsigned long timestamp)
 {
-    init(uid, data, at);
+    init(uid, data, at, timestamp);
 }
 
-Job::Job(const string& data, const long at)
+Job::Job(const string& data, const unsigned long at)
 {
     string uid = generate_job_uid();
-    init(uid, data, at);
+    init(uid, data, at, 0);
 }
 
 Job::~Job()
@@ -53,11 +59,11 @@ long Job::timestamp() const
     return _timestamp;
 }
 
-string Job::generate_job_uid()
+string generate_job_uid()
 {
-    uuid_t uuid;
-    uuid_generate_random(uuid);
-    char s[37];
-    uuid_unparse(uuid, s);
-    return string(s);
+    uuid_t uuid ;
+    uuid_generate_random( uuid ) ;
+    char temp[37] ;
+    uuid_unparse( uuid, temp ) ;
+    return temp;
 }

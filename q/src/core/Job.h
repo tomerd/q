@@ -19,16 +19,15 @@ class Job
 private:
     string _uid;
     string _data;
-    long _at;
-    long _timestamp;
+    unsigned long _at;
+    unsigned long _timestamp;
     
-    void init(const string& uid, const string& data, const long at);
-    string generate_job_uid();    
+    void init(const string& uid, const string& data, const unsigned long at, unsigned long timestamp);
     
 public:
     
-    Job(const string& uid, const string& data, const long at);
-    Job(const string& data, const long at=0);    
+    Job(const string& uid, const string& data, const unsigned long at, unsigned long timestamp);
+    Job(const string& data, const unsigned long at=0);    
     ~Job();
     
     string const& uid() const;

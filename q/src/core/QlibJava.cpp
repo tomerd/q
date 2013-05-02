@@ -9,7 +9,6 @@
 #include "QlibJava.h"
 
 #include "QFactory.h"
-#include "Logger.h"
 
 #include <list>
 
@@ -29,7 +28,6 @@ jlong Java_com_mishlabs_q_Q_native_1connect(JNIEnv* env, jobject obj)
 {
     Q* q = QFactory::createQ();
     q->start();
-    q_log("connected");
     return (long)q;
 }
 
@@ -47,7 +45,6 @@ void Java_com_mishlabs_q_Q_native_1disconnect(JNIEnv* env, jobject obj, jlong qp
     {
         env->DeleteGlobalRef(*it);
     }
-    q_log("disconnected");
 }
 
 JNIEXPORT JNICALL
@@ -59,16 +56,12 @@ jstring Java_com_mishlabs_q_Q_native_1post(JNIEnv* env, jobject obj, jlong qp, j
     Job* job = ((Q*)qp)->post(queue, data, at);
     env->ReleaseStringUTFChars(jqueue, queue);
     env->ReleaseStringUTFChars(jdata, data);
-    q_log("java posted %s on %s (%s)", data, queue, job->uid().c_str());
     return env->NewStringUTF(job->uid().c_str());
 }
 
 JNIEXPORT JNICALL
 void Java_com_mishlabs_q_Q_native_1worker(JNIEnv* env, jobject obj, jlong qp, jstring jqueue, jobject jdelegate)
 {
-    const char* queue = env->GetStringUTFChars(jqueue, NULL);
-    q_log("java registering worker for %s", queue);
-    
     jobject delegate = env->NewGlobalRef(jdelegate);
     workers.push_back(delegate);
     
@@ -79,8 +72,10 @@ void Java_com_mishlabs_q_Q_native_1worker(JNIEnv* env, jobject obj, jlong qp, js
         env->ThrowNew(env->FindClass("java/lang/Exception"), "could not find method 'perform', make sure the delegate is of correct type");
         return;
     }
-        
-    ((Q*)qp)->worker(queue, [=](Job* job, JobError** error)
+    
+    const char* queue = env->GetStringUTFChars(jqueue, NULL);
+    //((Q*)qp)->worker(queue, [=](Job* job, JobError** error)
+    ((Q*)qp)->worker(queue, std::shared_ptr<std::function<void (Job*, JobError** error)>>(new std::function<void (Job*, JobError**)>([=](Job* job, JobError** error)
     {
         JavaVM* jvm = NULL;
         env->GetJavaVM(&jvm);
@@ -88,16 +83,13 @@ void Java_com_mishlabs_q_Q_native_1worker(JNIEnv* env, jobject obj, jlong qp, js
         env->CallVoidMethod(delegate, method, env->NewStringUTF(job->data().c_str()));
         check_for_java_error(env, error);
         jvm->DetachCurrentThread();
-    });
+    })));
     env->ReleaseStringUTFChars(jqueue, queue);
 }
 
 JNIEXPORT JNICALL
 void Java_com_mishlabs_q_Q_native_1observer(JNIEnv* env, jobject obj, jlong qp, jstring jqueue, jobject jdelegate)
-{
-    const char* queue = env->GetStringUTFChars(jqueue, NULL);
-    q_log("java registering observer on %s", queue);
-    
+{    
     jobject delegate = env->NewGlobalRef(jdelegate);
     observers.push_back(delegate);
     
@@ -108,8 +100,10 @@ void Java_com_mishlabs_q_Q_native_1observer(JNIEnv* env, jobject obj, jlong qp, 
         env->ThrowNew(env->FindClass("java/lang/Exception"), "could not find method 'perform', make sure the delegate is of correct type");
         return;
     }
-    
-    ((Q*)qp)->observer(queue, [=](Job* job, JobError** error)
+        
+    const char* queue = env->GetStringUTFChars(jqueue, NULL);    
+    //((Q*)qp)->observer(queue, [=](Job* job, JobError** error)
+    ((Q*)qp)->observer(queue, std::shared_ptr<std::function<void (Job*, JobError**)>>(new std::function<void (Job*, JobError**)>([=](Job* job, JobError** error)
     {
         JavaVM* jvm = NULL;
         env->GetJavaVM(&jvm);
@@ -117,7 +111,7 @@ void Java_com_mishlabs_q_Q_native_1observer(JNIEnv* env, jobject obj, jlong qp, 
         env->CallVoidMethod(delegate, method, env->NewStringUTF(job->data().c_str()));
         check_for_java_error(env, error);
         jvm->DetachCurrentThread();
-    });
+    })));
     env->ReleaseStringUTFChars(jqueue, queue);
 }
 

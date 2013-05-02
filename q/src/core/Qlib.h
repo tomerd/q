@@ -13,7 +13,7 @@
 
 #include <JavaVM/jni.h>
 
-extern "C" char* q_version();
+extern "C" const char* q_version();
 
 extern "C" void q_connect(void** q);
 

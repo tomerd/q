@@ -8,6 +8,8 @@
 
 #include "Logger.h"
 
+static std::mutex* mutex = new std::mutex;
+
 char* replace_placeholders(const char* format, va_list args);
 
 void q_log(const char* format, ...)
@@ -16,7 +18,10 @@ void q_log(const char* format, ...)
     va_start(args, format);
     char* message = replace_placeholders(format, args);
     va_end(args);
+    mutex->lock();
     std::clog << message << "\n";
+    mutex->unlock();
+    delete message;
 }
 
 void q_error(const char* format, ...)
@@ -25,7 +30,10 @@ void q_error(const char* format, ...)
     va_start(args, format);
     char* message = replace_placeholders(format, args);
     va_end(args);
-    std::cerr << message << "\n";
+    mutex->lock();
+    std::clog << message << "\n";
+    mutex->unlock();
+    delete message;    
 }
 
 void q_log(const std::string& message)
@@ -34,7 +42,7 @@ void q_log(const std::string& message)
 }
 
 void q_error(const std::string& message)
-{
+{    
     q_error(message.c_str());
 }
 

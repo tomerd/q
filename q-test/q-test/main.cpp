@@ -18,7 +18,6 @@ void observer2(const char** data);
 
 int main(int argc, const char * argv[])
 {
-
     std::cout << q_version() << "\n";
     
     long now = 0;
@@ -27,10 +26,13 @@ int main(int argc, const char * argv[])
     void* q = NULL;
     q_connect(&q);
     
-    q_worker(q, "channel1", &worker1);
-    q_worker(q, "channel1", &worker2);
     q_observer(q, "channel1", &observer1);
     q_observer(q, "channel1", &observer2);
+    q_observer(q, "channel2", &observer1);
+    q_observer(q, "channel2", &observer2);
+
+    q_worker(q, "channel1", &worker1);
+    q_worker(q, "channel1", &worker2);
     
     q_post(q, "channel1", "test 11", 0);
     q_post(q, "channel1", "test 12", now + 5);
@@ -39,15 +41,31 @@ int main(int argc, const char * argv[])
     q_post(q, "channel1", "test 15", 0);
     q_post(q, "channel1", "test 16", now + 5);
     
-    q_post(q, "channel2", "test 21", 0);
-    q_post(q, "channel2", "test 22", 0);
-    q_post(q, "channel2", "test 23", 0);
-    
     sleep(15);
     
-    q_worker(q, "channel2", &worker1);
+    time(&now);
     
-    sleep(5);
+    q_post(q, "channel2", "test 21", 0);
+    q_post(q, "channel2", "test 22", now + 2);
+    q_post(q, "channel2", "test 23", 0);
+    
+    q_worker(q, "channel2", &worker1);
+
+    sleep(5);    
+    
+    /*for (uint index=0; index < 1024; index++)
+    {
+        char* data = new char[1024];
+        int w = sprintf(data, "test %d", index);
+        data[w] = '\0';
+        q_post(q, "channel1", data, 0);
+        delete data;
+    }
+    
+    q_worker(q, "channel1", &worker1);
+    
+    sleep(10);
+    */
     
     q_disconnect(q);
     
@@ -75,4 +93,5 @@ void observer2(const char** data)
 {
     std::cout << "observer 2 observed " << *data << "\n";
 }
+
 
