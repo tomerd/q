@@ -18,7 +18,7 @@ class QFactory
     
 public:
     
-    static Q* createQ();
+    static Q* createQ(const string& config);
     
 };
 

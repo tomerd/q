@@ -22,7 +22,7 @@ const char* q_version()
 EXPORT
 void q_connect(void** pq)
 {
-    *pq = QFactory::createQ();
+    *pq = QFactory::createQ("");
     ((Q*)(*pq))->start();
 }
 

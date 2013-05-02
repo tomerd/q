@@ -1,12 +1,12 @@
 //
-//  BerkleyQ.cpp
+//  BerkeleyQ.cpp
 //  q
 //
 //  Created by Tomer Doron on 4/30/13.
 //  Copyright (c) 2013 Tomer Doron. All rights reserved.
 //
 
-#include "BerkleyQ.h"
+#include "BerkeleyQ.h"
 
 #include <sstream>
 #include <algorithm>
@@ -24,18 +24,18 @@ const char* build_key(const char* format, ...);
 
 #define VALUE_SIZE 1024*1024
 
-BerkleyQ::BerkleyQ()
+BerkeleyQ::BerkeleyQ()
 {
     active = false;
     db = NULL;
     queue_lock_id = 0;
 }
 
-BerkleyQ::~BerkleyQ()
+BerkeleyQ::~BerkeleyQ()
 {
 }
 
-void BerkleyQ::start()
+void BerkeleyQ::start()
 {
     if (NULL != db) return;
         
@@ -81,7 +81,7 @@ void BerkleyQ::start()
     Q::start();
 }
 
-void BerkleyQ::stop()
+void BerkeleyQ::stop()
 {
     active = false;
     
@@ -111,7 +111,7 @@ void BerkleyQ::stop()
     Q::stop();
 }
 
-unsigned long BerkleyQ::size(const string& queue_name)
+unsigned long BerkeleyQ::size(const string& queue_name)
 {
     if (!active) return -1;
     
@@ -121,7 +121,7 @@ unsigned long BerkleyQ::size(const string& queue_name)
     return queue_size;
 }
 
-Job* BerkleyQ::peek(const string& queue_name)
+Job* BerkeleyQ::peek(const string& queue_name)
 {
     if (!active) return NULL;
     
@@ -133,7 +133,7 @@ Job* BerkleyQ::peek(const string& queue_name)
     return job;
 }
 
-Job* BerkleyQ::take(const string& queue_name)
+Job* BerkeleyQ::take(const string& queue_name)
 {
     if (!active) return NULL;
     
@@ -153,7 +153,7 @@ Job* BerkleyQ::take(const string& queue_name)
     return load_job(uid);
 }
 
-void BerkleyQ::push(const string& queue_name, Job* job)
+void BerkeleyQ::push(const string& queue_name, Job* job)
 {
     if (!active) return;
     
@@ -167,7 +167,7 @@ void BerkleyQ::push(const string& queue_name, Job* job)
     release_queue_lock(&lock);    
 }
 
-Job* BerkleyQ::find(const string& queue_name, const string& uid)
+Job* BerkeleyQ::find(const string& queue_name, const string& uid)
 {
     if (!active) return NULL;
     
@@ -179,7 +179,7 @@ Job* BerkleyQ::find(const string& queue_name, const string& uid)
     return job;
 }
 
-void BerkleyQ::erase(const string& queue_name, const string& uid)
+void BerkeleyQ::erase(const string& queue_name, const string& uid)
 {
     if (!active) return;
 
@@ -199,7 +199,7 @@ void BerkleyQ::erase(const string& queue_name, const string& uid)
     release_queue_lock(&lock);
 }
 
-DbLock BerkleyQ::acquire_queue_lock(const string& queue_name, const db_lockmode_t lock_mode)
+DbLock BerkeleyQ::acquire_queue_lock(const string& queue_name, const db_lockmode_t lock_mode)
 {
     DbLock lock;
     Dbt lock_info((void*)queue_name.c_str(), (uint)queue_name.size()+1);
@@ -214,7 +214,7 @@ DbLock BerkleyQ::acquire_queue_lock(const string& queue_name, const db_lockmode_
     return lock;
 }
 
-void BerkleyQ::release_queue_lock(DbLock* lock)
+void BerkeleyQ::release_queue_lock(DbLock* lock)
 {
     switch (int ret = db->get_env()->lock_put(lock))
     {
@@ -226,21 +226,21 @@ void BerkleyQ::release_queue_lock(DbLock* lock)
     }
 }
 
-vector<string> BerkleyQ::load_queue(const string& queue_name)
+vector<string> BerkeleyQ::load_queue(const string& queue_name)
 {
     string key = build_queue_key(queue_name);
     string result = load_record(key);
     return decode_queue(result);
 }
 
-void BerkleyQ::save_queue(const string& queue_name, vector<string> data)
+void BerkeleyQ::save_queue(const string& queue_name, vector<string> data)
 {
     string key = build_queue_key(queue_name);
     string value = encode_queue(data);
     save_record(key, value, 0);
 }
 
-unsigned long BerkleyQ::load_queue_size(const string& queue_name)
+unsigned long BerkeleyQ::load_queue_size(const string& queue_name)
 {
     string key = build_queue_size_key(queue_name);
     Dbt key_accessor((void*)key.c_str(), (uint)key.size()+1);
@@ -267,7 +267,7 @@ unsigned long BerkleyQ::load_queue_size(const string& queue_name)
     return value;
 }
 
-void BerkleyQ::save_queue_size(const string& queue_name, unsigned long size)
+void BerkeleyQ::save_queue_size(const string& queue_name, unsigned long size)
 {
     string key = build_queue_size_key(queue_name);
     Dbt key_accessor((void*)key.c_str(), (uint)key.size()+1);
@@ -284,27 +284,27 @@ void BerkleyQ::save_queue_size(const string& queue_name, unsigned long size)
     }
 }
 
-Job* BerkleyQ::load_job(const string& uid)
+Job* BerkeleyQ::load_job(const string& uid)
 {
     string key = build_job_key(uid);
     string result = load_record(key);
     return JobCodec::decode(result);
 }
 
-void BerkleyQ::save_job(const Job* job)
+void BerkeleyQ::save_job(const Job* job)
 {
     string key = build_job_key(job->uid());
     string value = JobCodec::encode(job);
     save_record(key, value, DB_OVERWRITE_DUP);
 }
 
-void BerkleyQ::delete_job(const string& uid)
+void BerkeleyQ::delete_job(const string& uid)
 {
     string key = build_job_key(uid);
     delete_record(key, 0);
 }
 
-string BerkleyQ::load_record(const string& key)
+string BerkeleyQ::load_record(const string& key)
 {
     Dbt key_accessor((void*)key.c_str(), (uint)key.size()+1);
     
@@ -334,7 +334,7 @@ string BerkleyQ::load_record(const string& key)
     return result;
 }
 
-void BerkleyQ::save_record(const string& key, const string& value, const uint flags)
+void BerkeleyQ::save_record(const string& key, const string& value, const uint flags)
 {
     Dbt key_accessor((void*)key.c_str(), (uint)key.size()+1);
     Dbt value_accessor((void*)value.c_str(), (uint)value.size());
@@ -353,7 +353,7 @@ void BerkleyQ::save_record(const string& key, const string& value, const uint fl
     }   
 }
 
-void BerkleyQ::delete_record(const string& key, const uint flags)
+void BerkeleyQ::delete_record(const string& key, const uint flags)
 {
     Dbt key_accessor((void*)key.c_str(), (uint)key.size()+1);
         

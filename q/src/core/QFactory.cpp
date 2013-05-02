@@ -9,10 +9,10 @@
 #include "QFactory.h"
 
 #include "TransientQ.h"
-#include "BerkleyQ.h"
+#include "BerkeleyQ.h"
 
-Q* QFactory::createQ()
+Q* QFactory::createQ(const string& config)
 {
     //return new TransientQ();
-    return new BerkleyQ();
+    return new BerkeleyQ();
 }

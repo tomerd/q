@@ -1,13 +1,13 @@
 //
-//  BerkleyQ.h
+//  BerkeleyQ.h
 //  q
 //
 //  Created by Tomer Doron on 4/30/13.
 //  Copyright (c) 2013 Tomer Doron. All rights reserved.
 //
 
-#ifndef __q__BerkleyQ__
-#define __q__BerkleyQ__
+#ifndef __q__BerkeleyQ__
+#define __q__BerkeleyQ__
 
 #include <iostream>
 #include <vector>
@@ -18,13 +18,13 @@
 
 using namespace std;
 
-class BerkleyQ : public Q
+class BerkeleyQ : public Q
 {
     
 public:
     
-    BerkleyQ();
-    ~BerkleyQ();
+    BerkeleyQ();
+    ~BerkeleyQ();
     
     void start();
     void stop();
@@ -63,4 +63,4 @@ private:
 };
 
 
-#endif /* defined(__q__BerkleyQ__) */
+#endif /* defined(__q__BerkeleyQ__) */

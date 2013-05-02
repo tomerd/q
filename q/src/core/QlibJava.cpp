@@ -26,7 +26,7 @@ jstring Java_com_mishlabs_q_Q_native_1version(JNIEnv* env, jobject obj)
 JNIEXPORT JNICALL
 jlong Java_com_mishlabs_q_Q_native_1connect(JNIEnv* env, jobject obj)
 {
-    Q* q = QFactory::createQ();
+    Q* q = QFactory::createQ("");
     q->start();
     return (long)q;
 }
