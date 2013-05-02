@@ -156,7 +156,7 @@ Job* BerkeleyQ::take(const string& queue_name)
         save_queue_size(queue_name, queue.size());
         
         job = load_job(uid);
-        delete_job(uid);
+        //delete_job(uid);
     }
     release_lock(&lock);
     return job;
@@ -384,7 +384,7 @@ void BerkeleyQ::delete_record(const string& key, const uint flags)
             //q_log("berkeley del: [%s] key deleted", key.c_str());
             break;
         case DB_NOTFOUND:
-            q_log("berkeley del: [%s] key already exists", key.c_str());
+            q_log("berkeley del: [%s] key not found", key.c_str());
             break;
         default:
             q_error("berkeley del: unknown error");
