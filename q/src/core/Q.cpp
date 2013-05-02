@@ -105,74 +105,84 @@ void Q::monitor_queue(Q* q, const string& queue_name)
         time(&now);
         Job* job = NULL;
 
+        // find the next job
         unsigned long size = q->size(queue_name);        
         for (unsigned long index=0; index < size; index++)
         {
             Job* candidate = q->take(queue_name);
-            if (NULL != candidate && candidate->at() < now)
+            if (NULL == candidate) continue;
+            if (candidate->at() <= now)
             {
                 job = candidate;
                 break;
             }
-            else if (NULL != candidate)
+            else
             {
+                // put back at end of queue
                 q->push(queue_name, candidate);
             }
         }
-        
-        workers_mutex->lock();
-        Workers::iterator workers_it = q->workers.find(queue_name);
-        
-        if (NULL == job
-            ||
-            (q->workers.end() == workers_it) || workers_it->second.first.empty())
+    
+        if (NULL == job)
         {
-            
-            workers_mutex->unlock();
+            q_log("queue '%s' - no jobs", queue_name.c_str());            
             sleep(1);
         }
         else
         {
-            JobError* job_error = NULL;
-            try
+            workers_mutex->lock();
+            Workers::iterator workers_it = q->workers.find(queue_name);
+            if (q->workers.end() == workers_it || workers_it->second.first.empty())
             {
-                // round-rubin
-                pair<WorkersList, uint>* workers_info = &workers_it->second;
-                WorkersList* workers_list = &workers_info->first;
-                uint* worker_index = &workers_info->second;
-                if (*worker_index >= workers_list->size()) *worker_index=0;;
-                WorkerDelegate worker = workers_list->at(*worker_index);
-                worker->operator()(job, &job_error);
-                ++*worker_index;
+                workers_mutex->unlock();
+                q_log("queue '%s' - no workers", queue_name.c_str());
+                // put back in queue                
+                q->push(queue_name, job);                
+                sleep(1);
             }
-            catch (exception& e)
+            else
             {
-                job_error = new JobError(e.what());
-            }
-            q->handle_job_result(queue_name, job, job_error);
-            workers_mutex->unlock();
-            
-            // observers
-            observers_mutex->lock();
-            Observers::iterator observers_it = q->observers.find(queue_name);
-            if (q->observers.end() != observers_it)
-            {
-                ObserversList* observers_list = &observers_it->second;
-                for (ObserversList::iterator observer_it = observers_list->begin(); observer_it != observers_list->end(); observer_it++)
+                JobError* job_error = NULL;
+                try
                 {
-                    try
+                    // round-rubin
+                    pair<WorkersList, uint>* workers_info = &workers_it->second;
+                    WorkersList* workers_list = &workers_info->first;
+                    uint* worker_index = &workers_info->second;
+                    if (*worker_index >= workers_list->size()) *worker_index=0;;
+                    WorkerDelegate worker = workers_list->at(*worker_index);
+                    worker->operator()(job, &job_error);
+                    ++*worker_index;
+                }
+                catch (exception& e)
+                {
+                    job_error = new JobError(e.what());
+                }
+                workers_mutex->unlock();
+                q->handle_job_result(queue_name, job, job_error);                
+                
+                // observers
+                observers_mutex->lock();
+                Observers::iterator observers_it = q->observers.find(queue_name);
+                if (q->observers.end() != observers_it)
+                {
+                    ObserversList* observers_list = &observers_it->second;
+                    for (ObserversList::iterator observer_it = observers_list->begin(); observer_it != observers_list->end(); observer_it++)
                     {
-                        JobError* observer_error = NULL;
-                        ObserverDelegate observer = *observer_it;
-                        observer->operator()(job, &observer_error);
-                    }
-                    catch (exception& e)
-                    {
-                        // TODO
+                        try
+                        {
+                            JobError* observer_error = NULL;
+                            ObserverDelegate observer = *observer_it;
+                            observer->operator()(job, &observer_error);
+                        }
+                        catch (exception& e)
+                        {
+                            // TODO
+                        }
                     }
                 }
+                observers_mutex->unlock();
             }
-            observers_mutex->unlock();
         }
     }
 }

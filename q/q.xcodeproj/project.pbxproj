@@ -10,11 +10,20 @@
 		F18B485C1730DC4700C44412 /* libdb_cxx-5.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F18B485B1730DC4700C44412 /* libdb_cxx-5.3.dylib */; };
 		F1ADE8AF1731C6D500A8FC40 /* JobCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1ADE8AD1731C6D500A8FC40 /* JobCodec.cpp */; };
 		F1ADE8B01731C6D500A8FC40 /* JobCodec.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8AE1731C6D500A8FC40 /* JobCodec.h */; };
-		F1ADE8C31731CAFF00A8FC40 /* autolink.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8C11731CAFF00A8FC40 /* autolink.h */; };
-		F1ADE8C41731CAFF00A8FC40 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8C21731CAFF00A8FC40 /* config.h */; };
-		F1ADE8C51731CEB600A8FC40 /* json_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1ADE8BA1731CA9400A8FC40 /* json_reader.cpp */; };
-		F1ADE8C61731CEB600A8FC40 /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1ADE8BB1731CA9400A8FC40 /* json_value.cpp */; };
-		F1ADE8C71731CEB600A8FC40 /* json_writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1ADE8BD1731CA9400A8FC40 /* json_writer.cpp */; };
+		F1ADE8DC173238A100A8FC40 /* BerkleyQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1ADE8DA173238A100A8FC40 /* BerkleyQ.cpp */; };
+		F1ADE8DD173238A100A8FC40 /* BerkleyQ.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8DB173238A100A8FC40 /* BerkleyQ.h */; };
+		F1ADE8EF173238C000A8FC40 /* autolink.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8E0173238C000A8FC40 /* autolink.h */; };
+		F1ADE8F0173238C000A8FC40 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8E1173238C000A8FC40 /* config.h */; };
+		F1ADE8F1173238C000A8FC40 /* features.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8E2173238C000A8FC40 /* features.h */; };
+		F1ADE8F2173238C000A8FC40 /* forwards.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8E3173238C000A8FC40 /* forwards.h */; };
+		F1ADE8F3173238C000A8FC40 /* json.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8E4173238C000A8FC40 /* json.h */; };
+		F1ADE8F4173238C000A8FC40 /* json_batchallocator.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8E5173238C000A8FC40 /* json_batchallocator.h */; };
+		F1ADE8F5173238C000A8FC40 /* json_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1ADE8E8173238C000A8FC40 /* json_reader.cpp */; };
+		F1ADE8F6173238C000A8FC40 /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1ADE8E9173238C000A8FC40 /* json_value.cpp */; };
+		F1ADE8F7173238C000A8FC40 /* json_writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1ADE8EB173238C000A8FC40 /* json_writer.cpp */; };
+		F1ADE8F8173238C000A8FC40 /* reader.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8EC173238C000A8FC40 /* reader.h */; };
+		F1ADE8F9173238C000A8FC40 /* value.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8ED173238C000A8FC40 /* value.h */; };
+		F1ADE8FA173238C000A8FC40 /* writer.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8EE173238C000A8FC40 /* writer.h */; };
 		F1BD7809172D0C64007F9B4D /* Job.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BD77FC172D0C64007F9B4D /* Job.cpp */; };
 		F1BD780A172D0C64007F9B4D /* Job.h in Headers */ = {isa = PBXBuildFile; fileRef = F1BD77FD172D0C64007F9B4D /* Job.h */; };
 		F1BD780B172D0C64007F9B4D /* JobError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BD77FE172D0C64007F9B4D /* JobError.cpp */; };
@@ -30,8 +39,6 @@
 		F1BD783117306DF1007F9B4D /* QFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = F1BD782F17306DF0007F9B4D /* QFactory.h */; };
 		F1BD7834173075B1007F9B4D /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BD7832173075B1007F9B4D /* Logger.cpp */; };
 		F1BD7835173075B1007F9B4D /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = F1BD7833173075B1007F9B4D /* Logger.h */; };
-		F1BD783A173097D2007F9B4D /* BerkleyQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BD7838173097D2007F9B4D /* BerkleyQ.cpp */; };
-		F1BD783B173097D2007F9B4D /* BerkleyQ.h in Headers */ = {isa = PBXBuildFile; fileRef = F1BD7839173097D2007F9B4D /* BerkleyQ.h */; };
 		F1BD783E173097DE007F9B4D /* RedisQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BD783C173097DE007F9B4D /* RedisQ.cpp */; };
 		F1BD783F173097DE007F9B4D /* RedisQ.h in Headers */ = {isa = PBXBuildFile; fileRef = F1BD783D173097DE007F9B4D /* RedisQ.h */; };
 		F1BD78411730B3D2007F9B4D /* Q.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BD78401730B3D1007F9B4D /* Q.cpp */; };
@@ -41,21 +48,23 @@
 		F18B485B1730DC4700C44412 /* libdb_cxx-5.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libdb_cxx-5.3.dylib"; path = "../../../../../../usr/local/lib/libdb_cxx-5.3.dylib"; sourceTree = "<group>"; };
 		F1ADE8AD1731C6D500A8FC40 /* JobCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JobCodec.cpp; sourceTree = "<group>"; };
 		F1ADE8AE1731C6D500A8FC40 /* JobCodec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JobCodec.h; sourceTree = "<group>"; };
-		F1ADE8B41731CA9400A8FC40 /* features.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = features.h; sourceTree = "<group>"; };
-		F1ADE8B51731CA9400A8FC40 /* forwards.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = forwards.h; sourceTree = "<group>"; };
-		F1ADE8B61731CA9400A8FC40 /* json.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
-		F1ADE8B71731CA9400A8FC40 /* json_batchallocator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = json_batchallocator.h; sourceTree = "<group>"; };
-		F1ADE8B81731CA9400A8FC40 /* json_internalarray.inl */ = {isa = PBXFileReference; lastKnownFileType = text; path = json_internalarray.inl; sourceTree = "<group>"; };
-		F1ADE8B91731CA9400A8FC40 /* json_internalmap.inl */ = {isa = PBXFileReference; lastKnownFileType = text; path = json_internalmap.inl; sourceTree = "<group>"; };
-		F1ADE8BA1731CA9400A8FC40 /* json_reader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = json_reader.cpp; sourceTree = "<group>"; };
-		F1ADE8BB1731CA9400A8FC40 /* json_value.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = json_value.cpp; sourceTree = "<group>"; };
-		F1ADE8BC1731CA9400A8FC40 /* json_valueiterator.inl */ = {isa = PBXFileReference; lastKnownFileType = text; path = json_valueiterator.inl; sourceTree = "<group>"; };
-		F1ADE8BD1731CA9400A8FC40 /* json_writer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = json_writer.cpp; sourceTree = "<group>"; };
-		F1ADE8BE1731CA9400A8FC40 /* reader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = reader.h; sourceTree = "<group>"; };
-		F1ADE8BF1731CA9400A8FC40 /* value.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = value.h; sourceTree = "<group>"; };
-		F1ADE8C01731CA9400A8FC40 /* writer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = writer.h; sourceTree = "<group>"; };
-		F1ADE8C11731CAFF00A8FC40 /* autolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = autolink.h; sourceTree = "<group>"; };
-		F1ADE8C21731CAFF00A8FC40 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		F1ADE8DA173238A100A8FC40 /* BerkleyQ.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BerkleyQ.cpp; sourceTree = "<group>"; };
+		F1ADE8DB173238A100A8FC40 /* BerkleyQ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BerkleyQ.h; sourceTree = "<group>"; };
+		F1ADE8E0173238C000A8FC40 /* autolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = autolink.h; sourceTree = "<group>"; };
+		F1ADE8E1173238C000A8FC40 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		F1ADE8E2173238C000A8FC40 /* features.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = features.h; sourceTree = "<group>"; };
+		F1ADE8E3173238C000A8FC40 /* forwards.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = forwards.h; sourceTree = "<group>"; };
+		F1ADE8E4173238C000A8FC40 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
+		F1ADE8E5173238C000A8FC40 /* json_batchallocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_batchallocator.h; sourceTree = "<group>"; };
+		F1ADE8E6173238C000A8FC40 /* json_internalarray.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_internalarray.inl; sourceTree = "<group>"; };
+		F1ADE8E7173238C000A8FC40 /* json_internalmap.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_internalmap.inl; sourceTree = "<group>"; };
+		F1ADE8E8173238C000A8FC40 /* json_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_reader.cpp; sourceTree = "<group>"; };
+		F1ADE8E9173238C000A8FC40 /* json_value.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_value.cpp; sourceTree = "<group>"; };
+		F1ADE8EA173238C000A8FC40 /* json_valueiterator.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_valueiterator.inl; sourceTree = "<group>"; };
+		F1ADE8EB173238C000A8FC40 /* json_writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_writer.cpp; sourceTree = "<group>"; };
+		F1ADE8EC173238C000A8FC40 /* reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reader.h; sourceTree = "<group>"; };
+		F1ADE8ED173238C000A8FC40 /* value.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = value.h; sourceTree = "<group>"; };
+		F1ADE8EE173238C000A8FC40 /* writer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = writer.h; sourceTree = "<group>"; };
 		F1BD77F3172D0C3E007F9B4D /* libq.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libq.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1BD77FC172D0C64007F9B4D /* Job.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Job.cpp; sourceTree = "<group>"; };
 		F1BD77FD172D0C64007F9B4D /* Job.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Job.h; sourceTree = "<group>"; };
@@ -72,8 +81,6 @@
 		F1BD782F17306DF0007F9B4D /* QFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QFactory.h; sourceTree = "<group>"; };
 		F1BD7832173075B1007F9B4D /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
 		F1BD7833173075B1007F9B4D /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
-		F1BD7838173097D2007F9B4D /* BerkleyQ.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BerkleyQ.cpp; sourceTree = "<group>"; };
-		F1BD7839173097D2007F9B4D /* BerkleyQ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BerkleyQ.h; sourceTree = "<group>"; };
 		F1BD783C173097DE007F9B4D /* RedisQ.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RedisQ.cpp; sourceTree = "<group>"; };
 		F1BD783D173097DE007F9B4D /* RedisQ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RedisQ.h; sourceTree = "<group>"; };
 		F1BD78401730B3D1007F9B4D /* Q.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Q.cpp; sourceTree = "<group>"; };
@@ -99,24 +106,41 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		F1ADE8B11731CA9400A8FC40 /* json */ = {
+		F1ADE8D9173238A100A8FC40 /* berkeley */ = {
 			isa = PBXGroup;
 			children = (
-				F1ADE8C11731CAFF00A8FC40 /* autolink.h */,
-				F1ADE8C21731CAFF00A8FC40 /* config.h */,
-				F1ADE8B41731CA9400A8FC40 /* features.h */,
-				F1ADE8B51731CA9400A8FC40 /* forwards.h */,
-				F1ADE8B61731CA9400A8FC40 /* json.h */,
-				F1ADE8B71731CA9400A8FC40 /* json_batchallocator.h */,
-				F1ADE8B81731CA9400A8FC40 /* json_internalarray.inl */,
-				F1ADE8B91731CA9400A8FC40 /* json_internalmap.inl */,
-				F1ADE8BA1731CA9400A8FC40 /* json_reader.cpp */,
-				F1ADE8BB1731CA9400A8FC40 /* json_value.cpp */,
-				F1ADE8BC1731CA9400A8FC40 /* json_valueiterator.inl */,
-				F1ADE8BD1731CA9400A8FC40 /* json_writer.cpp */,
-				F1ADE8BE1731CA9400A8FC40 /* reader.h */,
-				F1ADE8BF1731CA9400A8FC40 /* value.h */,
-				F1ADE8C01731CA9400A8FC40 /* writer.h */,
+				F1ADE8DA173238A100A8FC40 /* BerkleyQ.cpp */,
+				F1ADE8DB173238A100A8FC40 /* BerkleyQ.h */,
+			);
+			path = berkeley;
+			sourceTree = "<group>";
+		};
+		F1ADE8DE173238C000A8FC40 /* 3rd-party */ = {
+			isa = PBXGroup;
+			children = (
+				F1ADE8DF173238C000A8FC40 /* json */,
+			);
+			path = "3rd-party";
+			sourceTree = "<group>";
+		};
+		F1ADE8DF173238C000A8FC40 /* json */ = {
+			isa = PBXGroup;
+			children = (
+				F1ADE8E0173238C000A8FC40 /* autolink.h */,
+				F1ADE8E1173238C000A8FC40 /* config.h */,
+				F1ADE8E2173238C000A8FC40 /* features.h */,
+				F1ADE8E3173238C000A8FC40 /* forwards.h */,
+				F1ADE8E4173238C000A8FC40 /* json.h */,
+				F1ADE8E5173238C000A8FC40 /* json_batchallocator.h */,
+				F1ADE8E6173238C000A8FC40 /* json_internalarray.inl */,
+				F1ADE8E7173238C000A8FC40 /* json_internalmap.inl */,
+				F1ADE8E8173238C000A8FC40 /* json_reader.cpp */,
+				F1ADE8E9173238C000A8FC40 /* json_value.cpp */,
+				F1ADE8EA173238C000A8FC40 /* json_valueiterator.inl */,
+				F1ADE8EB173238C000A8FC40 /* json_writer.cpp */,
+				F1ADE8EC173238C000A8FC40 /* reader.h */,
+				F1ADE8ED173238C000A8FC40 /* value.h */,
+				F1ADE8EE173238C000A8FC40 /* writer.h */,
 			);
 			path = json;
 			sourceTree = "<group>";
@@ -142,9 +166,10 @@
 			isa = PBXGroup;
 			children = (
 				F1BD77FB172D0C64007F9B4D /* core */,
-				F1BD7805172D0C64007F9B4D /* redis */,
-				F1BD7837173097C4007F9B4D /* berkley */,
 				F1BD7806172D0C64007F9B4D /* transient */,
+				F1ADE8D9173238A100A8FC40 /* berkeley */,
+				F1BD7805172D0C64007F9B4D /* redis */,
+				F1ADE8DE173238C000A8FC40 /* 3rd-party */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -168,7 +193,6 @@
 				F1BD77FE172D0C64007F9B4D /* JobError.cpp */,
 				F1BD7833173075B1007F9B4D /* Logger.h */,
 				F1BD7832173075B1007F9B4D /* Logger.cpp */,
-				F1ADE8B11731CA9400A8FC40 /* json */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -191,15 +215,6 @@
 			path = transient;
 			sourceTree = "<group>";
 		};
-		F1BD7837173097C4007F9B4D /* berkley */ = {
-			isa = PBXGroup;
-			children = (
-				F1BD7839173097D2007F9B4D /* BerkleyQ.h */,
-				F1BD7838173097D2007F9B4D /* BerkleyQ.cpp */,
-			);
-			path = berkley;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -215,11 +230,18 @@
 				F1BD782D17304051007F9B4D /* QlibJava.h in Headers */,
 				F1BD783117306DF1007F9B4D /* QFactory.h in Headers */,
 				F1BD7835173075B1007F9B4D /* Logger.h in Headers */,
-				F1BD783B173097D2007F9B4D /* BerkleyQ.h in Headers */,
 				F1BD783F173097DE007F9B4D /* RedisQ.h in Headers */,
 				F1ADE8B01731C6D500A8FC40 /* JobCodec.h in Headers */,
-				F1ADE8C31731CAFF00A8FC40 /* autolink.h in Headers */,
-				F1ADE8C41731CAFF00A8FC40 /* config.h in Headers */,
+				F1ADE8DD173238A100A8FC40 /* BerkleyQ.h in Headers */,
+				F1ADE8EF173238C000A8FC40 /* autolink.h in Headers */,
+				F1ADE8F0173238C000A8FC40 /* config.h in Headers */,
+				F1ADE8F1173238C000A8FC40 /* features.h in Headers */,
+				F1ADE8F2173238C000A8FC40 /* forwards.h in Headers */,
+				F1ADE8F3173238C000A8FC40 /* json.h in Headers */,
+				F1ADE8F4173238C000A8FC40 /* json_batchallocator.h in Headers */,
+				F1ADE8F8173238C000A8FC40 /* reader.h in Headers */,
+				F1ADE8F9173238C000A8FC40 /* value.h in Headers */,
+				F1ADE8FA173238C000A8FC40 /* writer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,9 +296,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F1ADE8C51731CEB600A8FC40 /* json_reader.cpp in Sources */,
-				F1ADE8C61731CEB600A8FC40 /* json_value.cpp in Sources */,
-				F1ADE8C71731CEB600A8FC40 /* json_writer.cpp in Sources */,
 				F1BD7809172D0C64007F9B4D /* Job.cpp in Sources */,
 				F1BD780B172D0C64007F9B4D /* JobError.cpp in Sources */,
 				F1BD780E172D0C64007F9B4D /* Qlib.cpp in Sources */,
@@ -284,10 +303,13 @@
 				F1BD782C17304051007F9B4D /* QlibJava.cpp in Sources */,
 				F1BD783017306DF1007F9B4D /* QFactory.cpp in Sources */,
 				F1BD7834173075B1007F9B4D /* Logger.cpp in Sources */,
-				F1BD783A173097D2007F9B4D /* BerkleyQ.cpp in Sources */,
 				F1BD783E173097DE007F9B4D /* RedisQ.cpp in Sources */,
 				F1BD78411730B3D2007F9B4D /* Q.cpp in Sources */,
 				F1ADE8AF1731C6D500A8FC40 /* JobCodec.cpp in Sources */,
+				F1ADE8DC173238A100A8FC40 /* BerkleyQ.cpp in Sources */,
+				F1ADE8F5173238C000A8FC40 /* json_reader.cpp in Sources */,
+				F1ADE8F6173238C000A8FC40 /* json_value.cpp in Sources */,
+				F1ADE8F7173238C000A8FC40 /* json_writer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
