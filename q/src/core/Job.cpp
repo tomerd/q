@@ -11,8 +11,8 @@
 
 #include "Job.h"
 
-long get_current_time();
-string generate_job_uid();
+static long get_current_time();
+static string generate_job_uid();
 
 void Job::init(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long at, const unsigned long timestamp)
 {

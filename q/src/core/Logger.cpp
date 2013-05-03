@@ -10,7 +10,7 @@
 
 static std::mutex* mutex = new std::mutex;
 
-char* replace_placeholders(const char* format, va_list args);
+static char* replace_placeholders(const char* format, va_list args);
 
 void q_log(const char* format, ...)
 {        
@@ -49,10 +49,8 @@ void q_error(const std::string& message)
 char* replace_placeholders(const char* format, va_list args)
 {
     unsigned long max = strlen(format)*5;
-    char* buffer = new char[max];
-    int written = vsnprintf(buffer, max, format, args);
-    char* message = new char[written];
-    strncpy(message, buffer, written);
+    char* message = new char[max];
+    int written = vsnprintf(message, max, format, args);
     message[written] = '\0';
     return message;
 }

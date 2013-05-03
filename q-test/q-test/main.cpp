@@ -16,36 +16,63 @@
 
 using namespace std;
 
-void test1();
-void test2();
+static void test1(string config);
+static void test2(string config);
+static void test3(string config);
 
-bool received(string data);
-void assert_recieved(string data);
-void assert_not_recieved(string data);
+static bool received(string data);
+static void assert_recieved(string data);
+static void assert_not_recieved(string data);
 
-void worker1(const char** data);
-void worker2(const char** data);
-void observer1(const char** data);
-void observer2(const char** data);
+static void worker1(const char** data);
+static void worker2(const char** data);
+static void observer1(const char** data);
+static void observer2(const char** data);
 
 vector<string> recieved_buffer;
 
 int main(int argc, const char * argv[])
 {
     cout << q_version() << "\n";
+
+    string berkeley_config = "{ \"driver\": \"berkeley\" }";
+    string redis_config = "{ \"driver\": \"redis\", \"host\": \"127.0.0.1\" }";
     
-    test2();
+    test3(redis_config);
         
     return 0;
 }
 
-void test1()
+void test1(string config)
+{
+    void* q = NULL;
+    q_connect(&q, config.c_str());
+    if (NULL == q) return;
+    
+    q_worker(q, "channel1", &worker1);
+    
+    q_post(q, "channel1", "test 1", 0);
+    q_post(q, "channel1", "test 2", 0);
+    q_post(q, "channel1", "test 3", 0);
+    
+    sleep(2);
+    assert_recieved("test 1");
+    assert_recieved("test 2");
+    assert_recieved("test 3");
+    
+    q_disconnect(q);
+    
+    cout << "done\n";
+}
+
+void test2(string config)
 {
     long now = 0;
     time(&now);
     
     void* q = NULL;
-    q_connect(&q, NULL);
+    q_connect(&q, config.c_str());
+    if (NULL == q) return;
     
     q_observer(q, "channel1", &observer1);
     q_observer(q, "channel1", &observer2);
@@ -106,13 +133,14 @@ void test1()
     cout << "done\n";
 }
 
-void test2()
+void test3(string config)
 {
-    long now = 0;
-    time(&now);
-    
     void* q = NULL;
-    q_connect(&q, NULL);
+    q_connect(&q, config.c_str());
+    if (NULL == q) return;
+ 
+    //long now = 0;
+    //time(&now);
     
     q_worker(q, "channel1", &worker1);    
     for (uint index=0; index < 100000; index++)
@@ -126,7 +154,7 @@ void test2()
         if (index % 1000 == 0) q_worker(q, "channel1", &worker1);
     }
     
-    sleep(10);
+    sleep(30);
     
     q_disconnect(q);
     

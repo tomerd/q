@@ -47,9 +47,9 @@
 		F1BD7813172D12EA007F9B4D = {
 			isa = PBXGroup;
 			children = (
-				F1BD7828172D13A3007F9B4D /* libq.dylib */,
 				F1BD781E172D12EA007F9B4D /* q-test */,
 				F1BD781D172D12EA007F9B4D /* Products */,
+				F1BD7828172D13A3007F9B4D /* libq.dylib */,
 			);
 			sourceTree = "<group>";
 		};
@@ -230,6 +230,7 @@
 				F1BD7827172D12EA007F9B4D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

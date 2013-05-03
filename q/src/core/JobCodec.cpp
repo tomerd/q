@@ -31,12 +31,12 @@ Job* JobCodec::decode(const string& buffer)
     Json::Value root;
     Json::Reader reader;
     bool result = reader.parse(buffer, root);
-    if (!result)
+    if (!result || Json::objectValue != root.type())
     {
-        q_error("Failed to parsing json");
+        q_error(string("invalid job json ").append(reader.getFormatedErrorMessages()));
         return NULL;
     }
-    
+        
     string uid = root.get("uid", "").asString();
     string data = root.get("data", "").asString();
     JobStatus status = (JobStatus)root.get("status", JSUnknown).asInt();

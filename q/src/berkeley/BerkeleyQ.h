@@ -23,11 +23,11 @@ class BerkeleyQ : public Q
     
 public:
     
-    BerkeleyQ();
+    BerkeleyQ(const Json::Value& configuration);
     ~BerkeleyQ();
     
-    void start();
-    void stop();
+    bool connect();
+    void disconnect();
     
 protected:
     
@@ -44,7 +44,6 @@ protected:
     
 private:
     
-    bool active;
     Db* db;
     uint locker_id;
     

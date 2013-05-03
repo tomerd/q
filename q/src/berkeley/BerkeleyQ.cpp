@@ -14,19 +14,16 @@
 #include "JobCodec.h"
 #include "Logger.h"
 
-string encode_queue(const vector<string> data);
-vector<string> decode_queue(const string& data);
+static string encode_queue(const vector<string> data);
+static vector<string> decode_queue(const string& data);
 
-string build_queue_key(const string& queue_name);
-string build_queue_size_key(const string& queue_name);
-string build_job_key(const string& job_uid);
-const char* build_key(const char* format, ...);
+static string build_queue_key(const string& queue_name);
+static string build_queue_size_key(const string& queue_name);
+static string build_job_key(const string& job_uid);
+static string build_key(const char* format, ...);
 
-//#define VALUE_SIZE 1024*1024
-
-BerkeleyQ::BerkeleyQ()
+BerkeleyQ::BerkeleyQ(const Json::Value& configuration) : Q::Q(configuration)
 {
-    active = false;
     db = NULL;
     locker_id = 0;
 }
@@ -35,9 +32,9 @@ BerkeleyQ::~BerkeleyQ()
 {
 }
 
-void BerkeleyQ::start()
+bool BerkeleyQ::connect()
 {
-    if (NULL != db) return;
+    if (NULL != db) return true;
         
     try
     {
@@ -64,7 +61,7 @@ void BerkeleyQ::start()
                  NULL,          // Database file name
                  NULL,          // Optional logical database name
                  DB_BTREE,      // Database access method
-                 DB_CREATE,     // Open flags
+                 DB_CREATE | DB_THREAD,     // Open flags
                  0);            // File mode (using defaults)
         
         DbMpoolFile* mp = db->get_mpf();
@@ -72,24 +69,25 @@ void BerkeleyQ::start()
         
         db->get_env()->lock_id(&locker_id);
         
-        active = true;
-        Q::start();
+        start();
     }
     catch(DbException &e)
     {
-        q_error(e.what());
-        db = NULL;
+        db = NULL;        
+        q_error("failed connecting to berkeley. %s", e.what());
     }
     catch(std::exception &e)
     {
-        q_error(e.what());
         db = NULL;
+        q_error("failed connecting to berkeley. %s", e.what());
     }
+    
+    return (NULL != db);
 }
 
-void BerkeleyQ::stop()
+void BerkeleyQ::disconnect()
 {
-    active = false;
+    stop(); 
     
     if (NULL == db) return;
     
@@ -113,13 +111,13 @@ void BerkeleyQ::stop()
     {
         q_error(e.what());
     }
-    
-    Q::stop();
 }
+
+#pragma mark - protected
 
 unsigned long BerkeleyQ::size(const string& queue_name)
 {
-    if (!active) return -1;
+    if (!this->active) return -1;
     
     DbLock lock = acquire_lock(queue_name, DB_LOCK_READ);
     unsigned long queue_size = load_queue_size(queue_name);
@@ -129,12 +127,12 @@ unsigned long BerkeleyQ::size(const string& queue_name)
 
 Job* BerkeleyQ::peek(const string& queue_name)
 {
-    if (!active) return NULL;
+    if (!this->active) return NULL;
     
     DbLock lock = acquire_lock(queue_name, DB_LOCK_READ);
     vector<string> queue = load_queue_vector(queue_name);
     release_lock(&lock);
-    return !queue.empty() ? load_job_record(*queue.begin()) : NULL;
+    return !queue.empty() ? find_job(*queue.begin()) : NULL;
 }
 
 Job* BerkeleyQ::take(const string& queue_name)
@@ -152,7 +150,7 @@ Job* BerkeleyQ::take(const string& queue_name)
         save_queue_vector(queue_name, queue);
         save_queue_size(queue_name, queue.size());
         
-        job = load_job_record(uid);
+        job = find_job(uid);
     }
     release_lock(&lock);
     return job;
@@ -160,7 +158,7 @@ Job* BerkeleyQ::take(const string& queue_name)
 
 void BerkeleyQ::push(const string& queue_name, Job* job)
 {
-    if (!active) return;
+    if (!this->active) return;
     
     save_job_record(job);
     
@@ -211,12 +209,15 @@ void BerkeleyQ::remove(const string& queue_name, const string& uid)
 
 Job* BerkeleyQ::find_job(const string& uid)
 {
+    if (!this->active) return NULL;
     return load_job_record(uid);
 }
 
 Job* BerkeleyQ::update_job_status(const string& uid, const JobStatus status, const string& status_description)
 {
-    Job* job = load_job_record(uid);
+    if (!this->active) return NULL;
+    
+    Job* job = find_job(uid);
     Job* updated_job = job->withStatus(status, status_description);
     save_job_record(updated_job);
     return updated_job;
@@ -224,6 +225,8 @@ Job* BerkeleyQ::update_job_status(const string& uid, const JobStatus status, con
 
 void BerkeleyQ::delete_job(const string& uid)
 {
+    if (!this->active) return;
+    
     delete_job_record(uid);
     
     vector<string> all_queues = this->queues();
@@ -242,6 +245,8 @@ void BerkeleyQ::delete_job(const string& uid)
         release_lock(&lock);
     }
 }
+
+#pragma mark - private
 
 DbLock BerkeleyQ::acquire_lock(const string& name, const db_lockmode_t lock_mode)
 {
@@ -455,15 +460,13 @@ string build_job_key(const string& job_uid)
     return build_key("j:%s", job_uid.c_str());
 }
 
-const char* build_key(const char* format, ...)
+string build_key(const char* format, ...)
 {
-    va_list args;
-    va_start(args, format);    
     int max = 1024;
-    char* buffer = new char[max];
-    int written = vsnprintf(buffer, max, format, args);
-    char* key = new char[written];
-    strncpy(key, buffer, written);
+    char* key = new char[max];
+    va_list args;
+    va_start(args, format);
+    int written = vsnprintf(key, max, format, args);
     key[written] = '\0';
     va_end(args);
     return key;

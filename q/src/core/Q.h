@@ -18,6 +18,8 @@
 #include <thread>
 #include <thread>
 
+#include "json.h"
+
 #include "Job.h"
 #include "JobError.h"
 
@@ -40,11 +42,11 @@ class Q
     
 public:
     
-    Q();
+    Q(const Json::Value& configuration);
     ~Q();
     
-    virtual void start();
-    virtual void stop();
+    virtual bool connect();
+    virtual void disconnect();
     
     Job* post(const string& queue, const string& data, const long at);
     void worker(const string& queue, WorkerDelegate delegate);
@@ -52,7 +54,13 @@ public:
 
     vector<string> queues();
     
-protected:
+protected:    
+    
+    bool active;
+    const Json::Value configuration;
+    
+    void start();
+    void stop();
     
     virtual unsigned long size(const string& queue) = 0;
     virtual Job* peek(const string& queue) = 0;
@@ -70,19 +78,25 @@ private:
     static mutex* workers_mutex;
     static mutex* observers_mutex;
     
+    static void monitor_queue(Q* q, const string& queue);
+    
     Workers workers;
     
     Observers observers;
     
     Monitors monitors;
-    
-    bool started;
-    
-    static void monitor_queue(Q* q, const string& queue);
-    
+        
     void verify_queue_monitor(const string& queue);
     
-    void handle_job_result(const string& queue, const Job* job, const JobError* error);    
+    Job* handle_job_result(const string& queue, const Job* job, const JobError* error);
+    
+};
+
+struct q_exception : public exception
+{
+    string _description;
+    q_exception(string description) : _description(description) {}
+    const char* what() const throw() { return _description.c_str(); }
 };
 
 #endif

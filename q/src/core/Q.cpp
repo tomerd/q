@@ -14,29 +14,29 @@
 mutex* Q::workers_mutex = new mutex();
 mutex* Q::observers_mutex = new mutex();
 
-Q::Q()
+Q::Q(const Json::Value& configuration) : configuration(configuration), active(false)
 {
-    this->started = false;
 }
 
 Q::~Q()
 {
 }
 
-void Q::start()
+bool Q::connect()
 {
-    this->started = true;
-    q_log("connected");
+    start();
+    return true;
 }
 
-void Q::stop()
+void Q::disconnect()
 {
-    this->started = false;
-    q_log("disconnected");
+    stop();
 }
 
 Job* Q::post(const string& queue_name, const string& data, const long at)
 {
+    if (!this->active) return NULL;
+    
     Job* job = new Job(data, JSPending, at);
     push(queue_name, job);
     q_log("posted %s on %s (%s)", data.c_str(), queue_name.c_str(), job->uid().c_str());
@@ -45,6 +45,8 @@ Job* Q::post(const string& queue_name, const string& data, const long at)
 
 void Q::worker(const string& queue_name, WorkerDelegate delegate)
 {
+    if (!this->active) return;
+    
     q_log("registering worker for %s", queue_name.c_str());
     verify_queue_monitor(queue_name);
     workers_mutex->lock();
@@ -64,6 +66,8 @@ void Q::worker(const string& queue_name, WorkerDelegate delegate)
 
 void Q::observer(const string& queue_name, ObserverDelegate delegate)
 {
+    if (!this->active) return;
+    
     q_log("registering observer on %s", queue_name.c_str());
     verify_queue_monitor(queue_name);
     observers_mutex->lock();
@@ -83,6 +87,8 @@ void Q::observer(const string& queue_name, ObserverDelegate delegate)
 
 vector<string> Q::queues()
 {
+    if (!this->active) vector<string>();
+    
     vector<string> result;
     for (Monitors::iterator it = monitors.begin(); it != monitors.end(); it++)
     {
@@ -91,11 +97,23 @@ vector<string> Q::queues()
     return result;
 }
 
-void Q::handle_job_result(const string& queue_name, const Job* job, const JobError* error)
+void Q::start()
+{
+    this->active = true;
+    q_log("connected");
+}
+
+void Q::stop()
+{
+    this->active = false;
+    q_log("disconnected");
+}
+
+Job* Q::handle_job_result(const string& queue_name, const Job* job, const JobError* error)
 {
     bool success = NULL == error;
     q_log("job %s completed %s", job->uid().c_str(), (success ? "successfully" : "with error"));    
-    update_job_status(job->uid(), success ? JSComplete : JSFailed, success ? "" : error->description());
+    return update_job_status(job->uid(), success ? JSComplete : JSFailed, success ? "" : error->description());
 }
 
 void Q::verify_queue_monitor(const string& queue_name)
@@ -108,7 +126,7 @@ void Q::verify_queue_monitor(const string& queue_name)
 
 void Q::monitor_queue(Q* q, const string& queue_name)
 {    
-    while (q->started)
+    while (q->active)
     {
         q_log("checking queue '%s'", queue_name.c_str());
         
@@ -157,7 +175,7 @@ void Q::monitor_queue(Q* q, const string& queue_name)
         JobError* job_error = NULL;
         try
         {
-            q->update_job_status(job->uid(), JSActive, "");
+            job = q->update_job_status(job->uid(), JSActive, "");
             pair<WorkersList, uint>* workers_info = &workers_it->second;
             WorkersList* workers_list = &workers_info->first;
             uint* worker_index = &workers_info->second;
@@ -172,7 +190,7 @@ void Q::monitor_queue(Q* q, const string& queue_name)
             job_error = new JobError(e.what());
         }
         workers_mutex->unlock();
-        q->handle_job_result(queue_name, job, job_error);                
+        job = q->handle_job_result(queue_name, job, job_error);
         
         // notify observers
         observers_mutex->lock();

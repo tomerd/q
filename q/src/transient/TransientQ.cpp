@@ -16,7 +16,7 @@ mutex* TransientQ::queues_mutex = new mutex();
 Jobs TransientQ::jobs = Jobs();
 mutex* TransientQ::jobs_mutex = new mutex();
 
-TransientQ::TransientQ()
+TransientQ::TransientQ(const Json::Value& configuration) : Q::Q(configuration)
 {
 }
 

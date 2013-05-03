@@ -24,13 +24,14 @@ jstring Java_com_mishlabs_q_Q_native_1version(JNIEnv* env, jobject obj)
 }
 
 JNIEXPORT JNICALL
-jlong Java_com_mishlabs_q_Q_native_1connect(JNIEnv* env, jobject obj, jstring jconfig)
+jlong Java_com_mishlabs_q_Q_native_1connect(JNIEnv* env, jobject obj, jstring jconfiguration)
 {
-    const char* config = jconfig != NULL ? env->GetStringUTFChars(jconfig, NULL) : NULL;
-    Q* q = QFactory::createQ(NULL != config ? config : "");
-    q->start();
-    env->ReleaseStringUTFChars(jconfig, config);
-    return (long)q;
+    Q* pq = NULL;
+    const char* configuration = jconfiguration != NULL ? env->GetStringUTFChars(jconfiguration, NULL) : NULL;
+    env->ReleaseStringUTFChars(jconfiguration, configuration);
+    if (!QFactory::createQ(&pq, NULL != configuration ? configuration : "")) return 0;
+    if (!pq->connect()) return 0;
+    return (long)pq;
 }
 
 JNIEXPORT JNICALL
@@ -38,7 +39,7 @@ void Java_com_mishlabs_q_Q_native_1disconnect(JNIEnv* env, jobject obj, jlong qp
 {
     if (0 == qp) return;
     
-    ((Q*)qp)->stop();
+    ((Q*)qp)->disconnect();
     
     for (std::list<jobject>::iterator it = workers.begin(); it != workers.end(); it++)
     {

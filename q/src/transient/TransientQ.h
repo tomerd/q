@@ -27,7 +27,7 @@ class TransientQ : public Q
             
 public:
     
-    TransientQ();
+    TransientQ(const Json::Value& configuration);
     ~TransientQ();
     
 protected:

@@ -42,6 +42,20 @@
 		F1BD783E173097DE007F9B4D /* RedisQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BD783C173097DE007F9B4D /* RedisQ.cpp */; };
 		F1BD783F173097DE007F9B4D /* RedisQ.h in Headers */ = {isa = PBXBuildFile; fileRef = F1BD783D173097DE007F9B4D /* RedisQ.h */; };
 		F1BD78411730B3D2007F9B4D /* Q.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BD78401730B3D1007F9B4D /* Q.cpp */; };
+		F1CBDE2F17333DFA00F09841 /* ae.h in Headers */ = {isa = PBXBuildFile; fileRef = F1CBDE1817333DFA00F09841 /* ae.h */; };
+		F1CBDE3017333DFA00F09841 /* libev.h in Headers */ = {isa = PBXBuildFile; fileRef = F1CBDE1917333DFA00F09841 /* libev.h */; };
+		F1CBDE3117333DFA00F09841 /* libevent.h in Headers */ = {isa = PBXBuildFile; fileRef = F1CBDE1A17333DFA00F09841 /* libevent.h */; };
+		F1CBDE3217333DFA00F09841 /* async.c in Sources */ = {isa = PBXBuildFile; fileRef = F1CBDE1B17333DFA00F09841 /* async.c */; };
+		F1CBDE3317333DFA00F09841 /* async.h in Headers */ = {isa = PBXBuildFile; fileRef = F1CBDE1C17333DFA00F09841 /* async.h */; };
+		F1CBDE3417333DFA00F09841 /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = F1CBDE1F17333DFA00F09841 /* dict.c */; };
+		F1CBDE3517333DFA00F09841 /* dict.h in Headers */ = {isa = PBXBuildFile; fileRef = F1CBDE2017333DFA00F09841 /* dict.h */; };
+		F1CBDE3A17333DFA00F09841 /* fmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = F1CBDE2517333DFA00F09841 /* fmacros.h */; };
+		F1CBDE3B17333DFA00F09841 /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = F1CBDE2617333DFA00F09841 /* hiredis.c */; };
+		F1CBDE3C17333DFA00F09841 /* hiredis.h in Headers */ = {isa = PBXBuildFile; fileRef = F1CBDE2717333DFA00F09841 /* hiredis.h */; };
+		F1CBDE3E17333DFA00F09841 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = F1CBDE2917333DFA00F09841 /* net.c */; };
+		F1CBDE3F17333DFA00F09841 /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = F1CBDE2A17333DFA00F09841 /* net.h */; };
+		F1CBDE4017333DFA00F09841 /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = F1CBDE2C17333DFA00F09841 /* sds.c */; };
+		F1CBDE4117333DFA00F09841 /* sds.h in Headers */ = {isa = PBXBuildFile; fileRef = F1CBDE2D17333DFA00F09841 /* sds.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -84,6 +98,20 @@
 		F1BD783C173097DE007F9B4D /* RedisQ.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RedisQ.cpp; sourceTree = "<group>"; };
 		F1BD783D173097DE007F9B4D /* RedisQ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RedisQ.h; sourceTree = "<group>"; };
 		F1BD78401730B3D1007F9B4D /* Q.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Q.cpp; sourceTree = "<group>"; };
+		F1CBDE1817333DFA00F09841 /* ae.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ae.h; sourceTree = "<group>"; };
+		F1CBDE1917333DFA00F09841 /* libev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libev.h; sourceTree = "<group>"; };
+		F1CBDE1A17333DFA00F09841 /* libevent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libevent.h; sourceTree = "<group>"; };
+		F1CBDE1B17333DFA00F09841 /* async.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = async.c; path = hiredis/async.c; sourceTree = "<group>"; };
+		F1CBDE1C17333DFA00F09841 /* async.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = async.h; path = hiredis/async.h; sourceTree = "<group>"; };
+		F1CBDE1F17333DFA00F09841 /* dict.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dict.c; path = hiredis/dict.c; sourceTree = "<group>"; };
+		F1CBDE2017333DFA00F09841 /* dict.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dict.h; path = hiredis/dict.h; sourceTree = "<group>"; };
+		F1CBDE2517333DFA00F09841 /* fmacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fmacros.h; path = hiredis/fmacros.h; sourceTree = "<group>"; };
+		F1CBDE2617333DFA00F09841 /* hiredis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hiredis.c; path = hiredis/hiredis.c; sourceTree = "<group>"; };
+		F1CBDE2717333DFA00F09841 /* hiredis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hiredis.h; path = hiredis/hiredis.h; sourceTree = "<group>"; };
+		F1CBDE2917333DFA00F09841 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = net.c; path = hiredis/net.c; sourceTree = "<group>"; };
+		F1CBDE2A17333DFA00F09841 /* net.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = net.h; path = hiredis/net.h; sourceTree = "<group>"; };
+		F1CBDE2C17333DFA00F09841 /* sds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sds.c; path = hiredis/sds.c; sourceTree = "<group>"; };
+		F1CBDE2D17333DFA00F09841 /* sds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sds.h; path = hiredis/sds.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				F1ADE8DF173238C000A8FC40 /* json */,
+				F1CBDE1617333DDD00F09841 /* hiredis */,
 			);
 			path = "3rd-party";
 			sourceTree = "<group>";
@@ -215,6 +244,36 @@
 			path = transient;
 			sourceTree = "<group>";
 		};
+		F1CBDE1617333DDD00F09841 /* hiredis */ = {
+			isa = PBXGroup;
+			children = (
+				F1CBDE1B17333DFA00F09841 /* async.c */,
+				F1CBDE1C17333DFA00F09841 /* async.h */,
+				F1CBDE1F17333DFA00F09841 /* dict.c */,
+				F1CBDE2017333DFA00F09841 /* dict.h */,
+				F1CBDE2517333DFA00F09841 /* fmacros.h */,
+				F1CBDE2617333DFA00F09841 /* hiredis.c */,
+				F1CBDE2717333DFA00F09841 /* hiredis.h */,
+				F1CBDE2917333DFA00F09841 /* net.c */,
+				F1CBDE2A17333DFA00F09841 /* net.h */,
+				F1CBDE2C17333DFA00F09841 /* sds.c */,
+				F1CBDE2D17333DFA00F09841 /* sds.h */,
+				F1CBDE1717333DFA00F09841 /* adapters */,
+			);
+			name = hiredis;
+			sourceTree = "<group>";
+		};
+		F1CBDE1717333DFA00F09841 /* adapters */ = {
+			isa = PBXGroup;
+			children = (
+				F1CBDE1817333DFA00F09841 /* ae.h */,
+				F1CBDE1917333DFA00F09841 /* libev.h */,
+				F1CBDE1A17333DFA00F09841 /* libevent.h */,
+			);
+			name = adapters;
+			path = hiredis/adapters;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -242,6 +301,15 @@
 				F1ADE8F8173238C000A8FC40 /* reader.h in Headers */,
 				F1ADE8F9173238C000A8FC40 /* value.h in Headers */,
 				F1ADE8FA173238C000A8FC40 /* writer.h in Headers */,
+				F1CBDE2F17333DFA00F09841 /* ae.h in Headers */,
+				F1CBDE3017333DFA00F09841 /* libev.h in Headers */,
+				F1CBDE3117333DFA00F09841 /* libevent.h in Headers */,
+				F1CBDE3317333DFA00F09841 /* async.h in Headers */,
+				F1CBDE3517333DFA00F09841 /* dict.h in Headers */,
+				F1CBDE3A17333DFA00F09841 /* fmacros.h in Headers */,
+				F1CBDE3C17333DFA00F09841 /* hiredis.h in Headers */,
+				F1CBDE3F17333DFA00F09841 /* net.h in Headers */,
+				F1CBDE4117333DFA00F09841 /* sds.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +378,11 @@
 				F1ADE8F5173238C000A8FC40 /* json_reader.cpp in Sources */,
 				F1ADE8F6173238C000A8FC40 /* json_value.cpp in Sources */,
 				F1ADE8F7173238C000A8FC40 /* json_writer.cpp in Sources */,
+				F1CBDE3217333DFA00F09841 /* async.c in Sources */,
+				F1CBDE3417333DFA00F09841 /* dict.c in Sources */,
+				F1CBDE3B17333DFA00F09841 /* hiredis.c in Sources */,
+				F1CBDE3E17333DFA00F09841 /* net.c in Sources */,
+				F1CBDE4017333DFA00F09841 /* sds.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
