@@ -50,14 +50,20 @@ public:
     void worker(const string& queue, WorkerDelegate delegate);
     void observer(const string& queue, ObserverDelegate delegate);
 
+    vector<string> queues();
+    
 protected:
     
     virtual unsigned long size(const string& queue) = 0;
     virtual Job* peek(const string& queue) = 0;
     virtual Job* take(const string& queue) = 0;
     virtual void push(const string& queue, Job* job) = 0;
-    virtual Job* find(const string& queue, const string& uid) = 0;
-    virtual void erase(const string& queue, const string& uid) = 0;
+    //virtual Job* find(const string& queue, const string& uid) = 0;
+    //virtual void remove(const string& queue, const string& uid) = 0;
+    
+    virtual Job* find_job(const string& uid) = 0;
+    virtual Job* update_job_status(const string& uid, const JobStatus status, const string& status_description) = 0;
+    virtual void delete_job(const string& uid) = 0;
     
 private:
     

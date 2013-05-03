@@ -8,8 +8,13 @@
 
 #include "TransientQ.h"
 
+#include <algorithm>
+
 Queues TransientQ::queues = Queues();
 mutex* TransientQ::queues_mutex = new mutex();
+
+Jobs TransientQ::jobs = Jobs();
+mutex* TransientQ::jobs_mutex = new mutex();
 
 TransientQ::TransientQ()
 {
@@ -23,7 +28,7 @@ unsigned long TransientQ::size(const string& queue_name)
 {
     queues_mutex->lock();
     Queues::iterator queue_it = queues.find(queue_name);
-    unsigned long size = (queues.end() == queue_it) ? 0 : queue_it->second.first->size();
+    unsigned long size = (queues.end() == queue_it) ? 0 : queue_it->second.size();
     queues_mutex->unlock();
     return size;
 }
@@ -32,51 +37,45 @@ Job* TransientQ::peek(const string& queue_name)
 {
     queues_mutex->lock();
     Queues::iterator queue_it = queues.find(queue_name);
-    Job* job = (queues.end() == queue_it) ? NULL : queue_it->second.first->empty() ? NULL : *queue_it->second.first->begin();
+    Jobs::iterator job_it = queues.end() == queue_it || queue_it->second.empty() ? jobs.end() : *queue_it->second.begin();
+    Job* job = (jobs.end() == job_it) ? NULL : job_it->second;
     queues_mutex->unlock();
     return job;
 }
 
 Job* TransientQ::take(const string& queue_name)
 {
-    Job* job = NULL;
     queues_mutex->lock();
     Queues::iterator queue_it = queues.find(queue_name);
-    if (queues.end() != queue_it && !queue_it->second.first->empty())
-    {
-        JobsList* jobs_list = queue_it->second.first;
-        JobsIndex* jobs_index = queue_it->second.second;
-        // take from list - we want the head
-        JobsList::iterator jobs_list_it = jobs_list->begin();
-        job = *jobs_list_it;
-        // erase from list
-        jobs_list->erase(jobs_list_it);
-        // erase from index
-        JobsIndex::iterator jobs_index_it = jobs_index->find(job->uid());
-        if (jobs_index->end() != jobs_index_it) jobs_index->erase(jobs_index_it);        
-    }
-    queues_mutex->unlock();
-    return job;
+    Jobs::iterator job_it = queues.end() == queue_it || queue_it->second.empty() ? jobs.end() : *queue_it->second.begin();
+    Job* job = (jobs.end() == job_it) ? NULL : job_it->second;
+    queue_it->second.erase(queue_it->second.begin());
+    queues_mutex->unlock();    
+    return job;    
 }
 
 void TransientQ::push(const string& queue_name, Job* job)
 {
+    jobs_mutex->lock();
+    Jobs::iterator job_it = jobs.insert(jobs.end(), pair<string, Job*>(job->uid(), job));
+    jobs_mutex->unlock();
+    
     queues_mutex->lock();
-    Queues::iterator it = queues.find(queue_name);
-    pair<JobsList*, JobsIndex*> jobs_pair;
-    if (queues.end() == it)
+    Queues::iterator queue_it = queues.find(queue_name);
+    vector<Jobs::iterator>* jobs_index;
+    if (queues.end() == queue_it)
     {
-        jobs_pair = queues.insert(it, pair<string, pair<JobsList*, JobsIndex*>>(queue_name, pair<JobsList*, JobsIndex*>(new JobsList(), new JobsIndex())))->second;
+        jobs_index = &queues.insert(queue_it, pair<string, vector<Jobs::iterator>>(queue_name, vector<Jobs::iterator>()))->second;
     }
     else
     {
-        jobs_pair = it->second;
+        jobs_index = &queue_it->second;
     }
-    jobs_pair.first->push_back(job);
-    jobs_pair.second->insert(pair<string, JobsList::iterator>(job->uid(), jobs_pair.first->end()));
-    queues_mutex->unlock();
+    jobs_index->push_back(job_it);
+    queues_mutex->unlock();    
 }
 
+/*
 Job* TransientQ::find(const string& queue_name, const string& uid)
 {
     Job* job = NULL;
@@ -91,8 +90,10 @@ Job* TransientQ::find(const string& queue_name, const string& uid)
     queues_mutex->unlock();
     return job;
 }
+*/
 
-void TransientQ::erase(const string& queue_name, const string& uid)
+/*
+void TransientQ::remove(const string& queue_name, const string& uid)
 {
     queues_mutex->lock();
     Queues::iterator queue_it = queues.find(queue_name);
@@ -110,4 +111,48 @@ void TransientQ::erase(const string& queue_name, const string& uid)
         }
     }
     queues_mutex->unlock();
+}
+*/
+
+Job* TransientQ::find_job(const string& uid)
+{
+    jobs_mutex->lock();
+    Jobs::iterator job_it = jobs.find(uid);
+    Job* job = jobs.end() != job_it ? job_it->second : NULL;
+    jobs_mutex->unlock();
+    return job;
+}
+
+Job* TransientQ::update_job_status(const string& uid, const JobStatus status, const string& status_description)
+{
+    Job* updated_job = NULL;
+    jobs_mutex->lock();
+    Jobs::iterator job_it = jobs.find(uid);
+    if (jobs.end() != job_it)
+    {
+        updated_job = job_it->second->withStatus(status, status_description);
+        jobs.insert(jobs.end(), pair<string, Job*>(updated_job->uid(), updated_job));
+        jobs.erase(job_it);
+    }
+    jobs_mutex->unlock();
+    return updated_job;
+}
+
+void TransientQ::delete_job(const string& uid)
+{
+    jobs_mutex->lock();
+    Jobs::iterator job_it = jobs.find(uid);
+    if (jobs.end() != job_it) jobs.erase(job_it);
+    jobs_mutex->unlock();
+    
+    if (jobs.end() == job_it) return;
+    
+    queues_mutex->lock();
+    for (Queues::iterator queue_it = queues.begin(); queue_it != queues.end(); queue_it++)
+    {
+        vector<Jobs::iterator>* jobs_list = &queue_it->second;
+        vector<Jobs::iterator>::iterator jobs_list_it = std::find(jobs_list->begin(), jobs_list->end(), job_it);
+        if (jobs_list->end() != jobs_list_it) jobs_list->erase(jobs_list_it);
+    }
+    queues_mutex->unlock();    
 }

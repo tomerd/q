@@ -13,6 +13,6 @@
 
 Q* QFactory::createQ(const string& config)
 {
-    //return new TransientQ();
-    return new BerkeleyQ();
+    return new TransientQ();
+    //return new BerkeleyQ();
 }

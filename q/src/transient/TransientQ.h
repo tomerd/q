@@ -16,9 +16,11 @@
 
 #include "Q.h"
 
-typedef vector<Job*> JobsList;
-typedef map<string, JobsList::iterator> JobsIndex;
-typedef map<string, pair<JobsList*, JobsIndex*>> Queues;
+typedef map<string, Job*> Jobs;
+//typedef map<string, JobsList::iterator> JobsIndex;
+//typedef map<string, pair<JobsList*, JobsIndex*>> Queues;
+//typedef map<string, Jobs::iterator> JobsIndex;
+typedef map<string, vector<Jobs::iterator>> Queues;
 
 class TransientQ : public Q
 {
@@ -34,13 +36,20 @@ protected:
     Job* peek(const string& queue);
     Job* take(const string& queue);
     void push(const string& queue, Job* job);
-    Job* find(const string& queue, const string& uid);    
-    void erase(const string& queue, const string& uid);
+    //Job* find(const string& queue, const string& uid);
+    //void remove(const string& queue, const string& uid);
+    
+    Job* find_job(const string& uid);
+    Job* update_job_status(const string& uid, const JobStatus status, const string& status_description);
+    void delete_job(const string& uid);
     
 private:
     
     static Queues queues;
     static mutex* queues_mutex;
+    
+    static Jobs jobs;
+    static mutex* jobs_mutex;
     
 };
 

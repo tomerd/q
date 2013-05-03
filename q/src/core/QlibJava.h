@@ -21,10 +21,10 @@ extern "C" {
     /*
      * Class:     com_mishlabs_q_Q
      * Method:    native_connect
-     * Signature: ()J
+     * Signature: (Ljava/lang/String)J
      */
     JNIEXPORT jlong JNICALL Java_com_mishlabs_q_Q_native_1connect
-    (JNIEnv *, jobject);
+    (JNIEnv *, jobject, jstring);
     
     /*
      * Class:     com_mishlabs_q_Q

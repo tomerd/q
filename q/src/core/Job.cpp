@@ -11,32 +11,37 @@
 
 #include "Job.h"
 
+long get_current_time();
 string generate_job_uid();
 
-void Job::init(const string& uid, const string& data, const unsigned long at, const unsigned long timestamp)
+void Job::init(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long at, const unsigned long timestamp)
 {
-    long now = 0;
-    time(&now);
-    
     _uid = uid;
     _data = data;
     _at = at;
-    _timestamp = timestamp > 0 ? timestamp : now;
+    _status = status;
+    _status_description = status_description;
+    _timestamp = timestamp > 0 ? timestamp : get_current_time();
 }
 
-Job::Job(const string& uid, const string& data, const unsigned long at, const unsigned long timestamp)
+Job::Job(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long at, const unsigned long timestamp)
 {
-    init(uid, data, at, timestamp);
+    init(uid, data, status, status_description, at, timestamp);
 }
 
-Job::Job(const string& data, const unsigned long at)
+Job::Job(const string& data, const JobStatus status, const unsigned long at)
 {
     string uid = generate_job_uid();
-    init(uid, data, at, 0);
+    init(uid, data, status, "", at, 0);
 }
 
 Job::~Job()
 {
+}
+
+Job* Job::withStatus(JobStatus status, const string& status_description)
+{
+    return new Job(this->uid(), this->data(), status, status_description, this->at(), this->timestamp());
 }
 
 string const& Job::uid() const
@@ -49,6 +54,16 @@ string const& Job::data() const
     return _data;
 }
 
+JobStatus Job::status() const
+{
+    return _status;
+}
+
+string const& Job::status_description() const
+{
+    return  _status_description;
+}
+
 long Job::at() const
 {
     return _at;
@@ -57,6 +72,13 @@ long Job::at() const
 long Job::timestamp() const
 {
     return _timestamp;
+}
+
+long get_current_time()
+{
+    long now = 0;
+    time(&now);
+    return now;
 }
 
 string generate_job_uid()

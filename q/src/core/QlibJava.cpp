@@ -24,16 +24,20 @@ jstring Java_com_mishlabs_q_Q_native_1version(JNIEnv* env, jobject obj)
 }
 
 JNIEXPORT JNICALL
-jlong Java_com_mishlabs_q_Q_native_1connect(JNIEnv* env, jobject obj)
+jlong Java_com_mishlabs_q_Q_native_1connect(JNIEnv* env, jobject obj, jstring jconfig)
 {
-    Q* q = QFactory::createQ("");
+    const char* config = jconfig != NULL ? env->GetStringUTFChars(jconfig, NULL) : NULL;
+    Q* q = QFactory::createQ(NULL != config ? config : "");
     q->start();
+    env->ReleaseStringUTFChars(jconfig, config);
     return (long)q;
 }
 
 JNIEXPORT JNICALL
 void Java_com_mishlabs_q_Q_native_1disconnect(JNIEnv* env, jobject obj, jlong qp)
 {
+    if (0 == qp) return;
+    
     ((Q*)qp)->stop();
     
     for (std::list<jobject>::iterator it = workers.begin(); it != workers.end(); it++)
@@ -50,6 +54,10 @@ void Java_com_mishlabs_q_Q_native_1disconnect(JNIEnv* env, jobject obj, jlong qp
 JNIEXPORT JNICALL
 jstring Java_com_mishlabs_q_Q_native_1post(JNIEnv* env, jobject obj, jlong qp, jstring jqueue, jstring jdata, jlong jat)
 {
+    if (0 == qp) return NULL;
+    if (NULL == jqueue) return NULL;
+    if (NULL == jdata) return NULL;
+    
     const char* queue = env->GetStringUTFChars(jqueue, NULL);
     const char* data = env->GetStringUTFChars(jdata, NULL);
     long at = jat;
@@ -62,6 +70,10 @@ jstring Java_com_mishlabs_q_Q_native_1post(JNIEnv* env, jobject obj, jlong qp, j
 JNIEXPORT JNICALL
 void Java_com_mishlabs_q_Q_native_1worker(JNIEnv* env, jobject obj, jlong qp, jstring jqueue, jobject jdelegate)
 {
+    if (0 == qp) return;    
+    if (NULL == jqueue) return;
+    if (NULL == jdelegate) return;
+    
     jobject delegate = env->NewGlobalRef(jdelegate);
     workers.push_back(delegate);
     
@@ -89,7 +101,11 @@ void Java_com_mishlabs_q_Q_native_1worker(JNIEnv* env, jobject obj, jlong qp, js
 
 JNIEXPORT JNICALL
 void Java_com_mishlabs_q_Q_native_1observer(JNIEnv* env, jobject obj, jlong qp, jstring jqueue, jobject jdelegate)
-{    
+{
+    if (0 == qp) return;
+    if (NULL == jqueue) return;
+    if (NULL == jdelegate) return;
+    
     jobject delegate = env->NewGlobalRef(jdelegate);
     observers.push_back(delegate);
     

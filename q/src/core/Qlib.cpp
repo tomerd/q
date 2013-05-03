@@ -20,21 +20,26 @@ const char* q_version()
 }
 
 EXPORT
-void q_connect(void** pq)
+void q_connect(void** pq, const char* config)
 {
-    *pq = QFactory::createQ("");
+    if (NULL == pq) return;    
+    *pq = QFactory::createQ(NULL != config ? config : "");
     ((Q*)(*pq))->start();
 }
 
 EXPORT
 void q_disconnect(void* q)
 {
+    if (NULL == q) return;    
     ((Q*)q)->stop();
 }
 
 EXPORT
 const char* q_post(void* q, const char* queue, const char* data, const long at)
 {
+    if (NULL == q) return NULL;
+    if (NULL == queue) return NULL;
+    if (NULL == data) return NULL;
     Job* job = ((Q*)q)->post(queue, data, at);
     return job->uid().c_str();
 }
@@ -42,6 +47,9 @@ const char* q_post(void* q, const char* queue, const char* data, const long at)
 EXPORT
 void q_worker(void* q, const char* queue, void (*delegate)(const char**))
 {
+    if (NULL == q) return;
+    if (NULL == queue) return;
+    if (NULL == delegate) return;
     //((Q*)q)->worker(queue, [=](Job* job, JobError** error)
     ((Q*)q)->worker(queue, std::shared_ptr<std::function<void (Job*, JobError** error)>>(new std::function<void (Job*, JobError**)>([=](Job* job, JobError** error)
     {
@@ -54,6 +62,9 @@ void q_worker(void* q, const char* queue, void (*delegate)(const char**))
 EXPORT
 void q_observer(void* q, const char* queue, void (*delegate)(const char**))
 {
+    if (NULL == q) return;
+    if (NULL == queue) return;
+    if (NULL == delegate) return;
     //((Q*)q)->observer(queue, [=](Job* job, JobError** error)
     ((Q*)q)->observer(queue, std::shared_ptr<std::function<void (Job*, JobError**)>>(new std::function<void (Job*, JobError**)>([=](Job* job, JobError** error)
     {

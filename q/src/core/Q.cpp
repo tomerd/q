@@ -37,7 +37,7 @@ void Q::stop()
 
 Job* Q::post(const string& queue_name, const string& data, const long at)
 {
-    Job* job = new Job(data, at);
+    Job* job = new Job(data, JSPending, at);
     push(queue_name, job);
     q_log("posted %s on %s (%s)", data.c_str(), queue_name.c_str(), job->uid().c_str());
     return job;
@@ -81,10 +81,21 @@ void Q::observer(const string& queue_name, ObserverDelegate delegate)
     observers_mutex->unlock();
 }
 
+vector<string> Q::queues()
+{
+    vector<string> result;
+    for (Monitors::iterator it = monitors.begin(); it != monitors.end(); it++)
+    {
+        result.push_back(it->first);
+    }
+    return result;
+}
+
 void Q::handle_job_result(const string& queue_name, const Job* job, const JobError* error)
 {
-    q_log("job %s completed %s", job->uid().c_str(), (NULL == error ? "successfully" : "with error"));
-    if (NULL != error) q_error(error->description());
+    bool success = NULL == error;
+    q_log("job %s completed %s", job->uid().c_str(), (success ? "successfully" : "with error"));    
+    update_job_status(job->uid(), success ? JSComplete : JSFailed, success ? "" : error->description());
 }
 
 void Q::verify_queue_monitor(const string& queue_name)
@@ -101,16 +112,16 @@ void Q::monitor_queue(Q* q, const string& queue_name)
     {
         q_log("checking queue '%s'", queue_name.c_str());
         
-        long now = 0;
-        time(&now);
-        Job* job = NULL;
-
         // find the next job
+        Job* job = NULL;        
         unsigned long size = q->size(queue_name);        
         for (unsigned long index=0; index < size; index++)
         {
             Job* candidate = q->take(queue_name);
             if (NULL == candidate) continue;
+            
+            long now = 0;
+            time(&now);            
             if (candidate->at() <= now)
             {
                 job = candidate;
@@ -125,64 +136,64 @@ void Q::monitor_queue(Q* q, const string& queue_name)
     
         if (NULL == job)
         {
-            q_log("queue '%s' - no jobs", queue_name.c_str());            
+            q_log("queue [%s] - no jobs", queue_name.c_str());            
             sleep(1);
+            continue;
         }
-        else
+
+        workers_mutex->lock();
+        Workers::iterator workers_it = q->workers.find(queue_name);
+        if (q->workers.end() == workers_it || workers_it->second.first.empty())
         {
-            workers_mutex->lock();
-            Workers::iterator workers_it = q->workers.find(queue_name);
-            if (q->workers.end() == workers_it || workers_it->second.first.empty())
+            workers_mutex->unlock();
+            q_log("queue [%s] - no workers", queue_name.c_str());
+            // put back in queue                
+            q->push(queue_name, job);                
+            sleep(1);
+            continue;
+        }
+
+        // call workers in round-rubin fashion
+        JobError* job_error = NULL;
+        try
+        {
+            q->update_job_status(job->uid(), JSActive, "");
+            pair<WorkersList, uint>* workers_info = &workers_it->second;
+            WorkersList* workers_list = &workers_info->first;
+            uint* worker_index = &workers_info->second;
+            if (*worker_index >= workers_list->size()) *worker_index=0;;
+            WorkerDelegate worker = workers_list->at(*worker_index);
+            worker->operator()(job, &job_error);
+            ++*worker_index;
+        }
+        catch (exception& e)
+        {
+            q_log("queue [%s] - worker failed on [%s]. %s", queue_name.c_str(), job->uid().c_str(), e.what());
+            job_error = new JobError(e.what());
+        }
+        workers_mutex->unlock();
+        q->handle_job_result(queue_name, job, job_error);                
+        
+        // notify observers
+        observers_mutex->lock();
+        Observers::iterator observers_it = q->observers.find(queue_name);
+        if (q->observers.end() != observers_it)
+        {
+            ObserversList* observers_list = &observers_it->second;
+            for (ObserversList::iterator observer_it = observers_list->begin(); observer_it != observers_list->end(); observer_it++)
             {
-                workers_mutex->unlock();
-                q_log("queue '%s' - no workers", queue_name.c_str());
-                // put back in queue                
-                q->push(queue_name, job);                
-                sleep(1);
-            }
-            else
-            {
-                JobError* job_error = NULL;
                 try
                 {
-                    // round-rubin
-                    pair<WorkersList, uint>* workers_info = &workers_it->second;
-                    WorkersList* workers_list = &workers_info->first;
-                    uint* worker_index = &workers_info->second;
-                    if (*worker_index >= workers_list->size()) *worker_index=0;;
-                    WorkerDelegate worker = workers_list->at(*worker_index);
-                    worker->operator()(job, &job_error);
-                    ++*worker_index;
+                    JobError* observer_error = NULL;
+                    ObserverDelegate observer = *observer_it;
+                    observer->operator()(job, &observer_error);
                 }
                 catch (exception& e)
                 {
-                    job_error = new JobError(e.what());
+                    q_log("queue [%s] - observer failed on [%s]. %s", queue_name.c_str(), job->uid().c_str(), e.what());
                 }
-                workers_mutex->unlock();
-                q->handle_job_result(queue_name, job, job_error);                
-                
-                // observers
-                observers_mutex->lock();
-                Observers::iterator observers_it = q->observers.find(queue_name);
-                if (q->observers.end() != observers_it)
-                {
-                    ObserversList* observers_list = &observers_it->second;
-                    for (ObserversList::iterator observer_it = observers_list->begin(); observer_it != observers_list->end(); observer_it++)
-                    {
-                        try
-                        {
-                            JobError* observer_error = NULL;
-                            ObserverDelegate observer = *observer_it;
-                            observer->operator()(job, &observer_error);
-                        }
-                        catch (exception& e)
-                        {
-                            // TODO
-                        }
-                    }
-                }
-                observers_mutex->unlock();
             }
         }
+        observers_mutex->unlock();
     }
 }

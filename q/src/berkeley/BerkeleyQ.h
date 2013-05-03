@@ -35,8 +35,12 @@ protected:
     Job* peek(const string& queue);
     Job* take(const string& queue);
     void push(const string& queue, Job* job);
-    Job* find(const string& queue, const string& uid);
-    void erase(const string& queue, const string& uid);
+    //Job* find(const string& queue, const string& uid);
+    //void remove(const string& queue, const string& uid);
+    
+    Job* find_job(const string& uid);
+    Job* update_job_status(const string& uid, const JobStatus status, const string& status_description);
+    void delete_job(const string& uid);
     
 private:
     
@@ -47,18 +51,18 @@ private:
     DbLock acquire_lock(const string& lock_name, const db_lockmode_t lock_mode);
     void release_lock(DbLock* lock);
     
-    vector<string> load_queue(const string& queue_name);
-    void save_queue(const string& queue_name, const vector<string> data);
+    unsigned long load_queue_size(const string& queue_name);
+    void save_queue_size(const string& queue_name, unsigned long size);
     
     string load_queue_raw(const string& queue_name);
     void save_queue_raw(const string& queue_name, const string& data);
     
-    unsigned long load_queue_size(const string& queue_name);
-    void save_queue_size(const string& queue_name, unsigned long size);
+    vector<string> load_queue_vector(const string& queue_name);
+    void save_queue_vector(const string& queue_name, const vector<string> data);
     
-    Job* load_job(const string& uid);
-    void save_job(const Job* job);
-    void delete_job(const string& uid);
+    Job* load_job_record(const string& uid);
+    void save_job_record(const Job* job);
+    void delete_job_record(const string& uid);
     
     string load_record(const string& key);
     void save_record(const string& key, const string& value, const uint flags);

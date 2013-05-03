@@ -17,7 +17,9 @@ string JobCodec::encode(const Job* job)
     Json::StyledWriter writer;
     
     root["uid"] = job->uid();
-    root["data"] = job->data();;
+    root["data"] = job->data();
+    root["status"] = job->status();
+    root["status_description"] = job->status_description();
     root["at"] = (int)job->at();
     root["timestamp"] = (int)job->timestamp();
     
@@ -37,8 +39,10 @@ Job* JobCodec::decode(const string& buffer)
     
     string uid = root.get("uid", "").asString();
     string data = root.get("data", "").asString();
+    JobStatus status = (JobStatus)root.get("status", JSUnknown).asInt();
+    string status_description = root.get("status_description", "").asString();
     long at = root.get("at", 0).asInt();
     long timestamp = root.get("timestamp", 0).asInt();
                                               
-    return new Job(uid, data, at, timestamp);
+    return new Job(uid, data, status, status_description, at, timestamp);
 }

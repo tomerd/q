@@ -41,23 +41,21 @@ void BerkeleyQ::start()
         
     try
     {
+        int ret = 0;        
         uint env_flags =    DB_CREATE     |  /* Create the environment if it does not exist */
                             DB_INIT_LOCK  |  /* Initialize the locking subsystem */
-                            //DB_INIT_LOG   |  /* Initialize the logging subsystem */
-                            //DB_INIT_TXN   |  /* Initialize the transactional subsystem. This
-                            //                  * also turns on logging. */
                             DB_INIT_MPOOL |  /* Initialize the memory pool (in-memory cache) */
-                            DB_PRIVATE    |   /* Region files are not backed by the
+                            DB_PRIVATE    |  /* Region files are not backed by the
                                               * filesystem. Instead, they are backed by
                                               * heap memory.  */
                             DB_THREAD;
         
         DbEnv* env = new DbEnv(0);
         
-        int ret = env->set_cachesize(0,                  /* 0 gigabytes */
-                                     50 * 1024 * 1024,   /* 50 megabytes */
-                                     1);                 /* Create 1 cache. All memory will
-                                                          * be allocated contiguously. */        
+        ret = env->set_cachesize(0,                  /* 0 gigabytes */
+                                 50 * 1024 * 1024,   /* 50 megabytes */
+                                 1);                 /* Create 1 cache. All memory will
+                                                      * be allocated contiguously. */
         env->open(NULL, env_flags, 0);
         
         db = new Db(env, 0); // Instantiate the Db object
@@ -66,7 +64,7 @@ void BerkeleyQ::start()
                  NULL,          // Database file name
                  NULL,          // Optional logical database name
                  DB_BTREE,      // Database access method
-                 DB_CREATE  ,     // Open flags
+                 DB_CREATE,     // Open flags
                  0);            // File mode (using defaults)
         
         DbMpoolFile* mp = db->get_mpf();
@@ -75,6 +73,7 @@ void BerkeleyQ::start()
         db->get_env()->lock_id(&locker_id);
         
         active = true;
+        Q::start();
     }
     catch(DbException &e)
     {
@@ -86,8 +85,6 @@ void BerkeleyQ::start()
         q_error(e.what());
         db = NULL;
     }
-    
-    Q::start();
 }
 
 void BerkeleyQ::stop()
@@ -135,9 +132,9 @@ Job* BerkeleyQ::peek(const string& queue_name)
     if (!active) return NULL;
     
     DbLock lock = acquire_lock(queue_name, DB_LOCK_READ);
-    vector<string> queue = load_queue(queue_name);
+    vector<string> queue = load_queue_vector(queue_name);
     release_lock(&lock);
-    return !queue.empty() ? load_job(*queue.begin()) : NULL;
+    return !queue.empty() ? load_job_record(*queue.begin()) : NULL;
 }
 
 Job* BerkeleyQ::take(const string& queue_name)
@@ -146,17 +143,16 @@ Job* BerkeleyQ::take(const string& queue_name)
     
     Job* job = NULL;
     DbLock lock = acquire_lock(queue_name, DB_LOCK_WRITE);
-    vector<string> queue = load_queue(queue_name);
+    vector<string> queue = load_queue_vector(queue_name);
     if (!queue.empty())
     {
         vector<string>::iterator head = queue.begin();
         string uid = *head;
         queue.erase(head);
-        save_queue(queue_name, queue);
+        save_queue_vector(queue_name, queue);
         save_queue_size(queue_name, queue.size());
         
-        job = load_job(uid);
-        //delete_job(uid);
+        job = load_job_record(uid);
     }
     release_lock(&lock);
     return job;
@@ -166,7 +162,7 @@ void BerkeleyQ::push(const string& queue_name, Job* job)
 {
     if (!active) return;
     
-    save_job(job);
+    save_job_record(job);
     
     DbLock lock = acquire_lock(queue_name, DB_LOCK_WRITE);
     string raw_queue = load_queue_raw(queue_name);
@@ -182,6 +178,7 @@ void BerkeleyQ::push(const string& queue_name, Job* job)
     release_lock(&lock);
 }
 
+/*
 Job* BerkeleyQ::find(const string& queue_name, const string& uid)
 {
     if (!active) return NULL;
@@ -193,7 +190,7 @@ Job* BerkeleyQ::find(const string& queue_name, const string& uid)
     return it != queue.end() ? load_job(*it) : NULL;
 }
 
-void BerkeleyQ::erase(const string& queue_name, const string& uid)
+void BerkeleyQ::remove(const string& queue_name, const string& uid)
 {
     if (!active) return;
 
@@ -209,6 +206,41 @@ void BerkeleyQ::erase(const string& queue_name, const string& uid)
         save_queue_size(queue_name, queue.size());
     }
     release_lock(&lock);
+}
+*/
+
+Job* BerkeleyQ::find_job(const string& uid)
+{
+    return load_job_record(uid);
+}
+
+Job* BerkeleyQ::update_job_status(const string& uid, const JobStatus status, const string& status_description)
+{
+    Job* job = load_job_record(uid);
+    Job* updated_job = job->withStatus(status, status_description);
+    save_job_record(updated_job);
+    return updated_job;
+}
+
+void BerkeleyQ::delete_job(const string& uid)
+{
+    delete_job_record(uid);
+    
+    vector<string> all_queues = this->queues();
+    for (vector<string>::iterator queue_it = all_queues.begin(); queue_it != all_queues.end(); queue_it++)
+    {
+        string queue_name = *queue_it;
+        DbLock lock = acquire_lock(queue_name, DB_LOCK_WRITE);
+        vector<string> queue = load_queue_vector(queue_name);
+        vector<string>::iterator it = std::find(queue.begin(), queue.end(), uid);
+        if (it != queue.end())
+        {
+            queue.erase(it);
+            save_queue_vector(queue_name, queue);
+            save_queue_size(queue_name, queue.size());
+        }
+        release_lock(&lock);
+    }
 }
 
 DbLock BerkeleyQ::acquire_lock(const string& name, const db_lockmode_t lock_mode)
@@ -288,35 +320,35 @@ void BerkeleyQ::save_queue_raw(const string& queue_name, const string& data)
     save_record(key, data, 0);
 }
 
-vector<string> BerkeleyQ::load_queue(const string& queue_name)
+vector<string> BerkeleyQ::load_queue_vector(const string& queue_name)
 {
     string key = build_queue_key(queue_name);
     string result = load_record(key);
     return decode_queue(result);
 }
 
-void BerkeleyQ::save_queue(const string& queue_name, vector<string> data)
+void BerkeleyQ::save_queue_vector(const string& queue_name, vector<string> data)
 {
     string key = build_queue_key(queue_name);
     string value = encode_queue(data);
     save_record(key, value, 0);
 }
 
-Job* BerkeleyQ::load_job(const string& uid)
+Job* BerkeleyQ::load_job_record(const string& uid)
 {
     string key = build_job_key(uid);
     string result = load_record(key);
     return JobCodec::decode(result);
 }
 
-void BerkeleyQ::save_job(const Job* job)
+void BerkeleyQ::save_job_record(const Job* job)
 {
     string key = build_job_key(job->uid());
     string value = JobCodec::encode(job);
     save_record(key, value, DB_OVERWRITE_DUP);
 }
 
-void BerkeleyQ::delete_job(const string& uid)
+void BerkeleyQ::delete_job_record(const string& uid)
 {
     string key = build_job_key(uid);
     delete_record(key, 0);

@@ -15,7 +15,7 @@
 
 extern "C" const char* q_version();
 
-extern "C" void q_connect(void** q);
+extern "C" void q_connect(void** q, const char* config);
 
 extern "C" void q_disconnect(void* q);
 
