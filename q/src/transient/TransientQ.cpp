@@ -24,6 +24,17 @@ TransientQ::~TransientQ()
 {
 }
 
+void TransientQ::flush()
+{
+    queues_mutex->lock();
+    queues.clear();
+    queues_mutex->unlock();
+    
+    jobs_mutex->lock();
+    jobs.clear();
+    jobs_mutex->unlock();
+}
+
 unsigned long TransientQ::size(const string& queue_name)
 {
     queues_mutex->lock();
@@ -33,31 +44,31 @@ unsigned long TransientQ::size(const string& queue_name)
     return size;
 }
 
-Job* TransientQ::peek(const string& queue_name)
+JobOption TransientQ::peek(const string& queue_name)
 {
     queues_mutex->lock();
     Queues::iterator queue_it = queues.find(queue_name);
     Jobs::iterator job_it = queues.end() == queue_it || queue_it->second.empty() ? jobs.end() : *queue_it->second.begin();
-    Job* job = (jobs.end() == job_it) ? NULL : job_it->second;
+    Job* job = (jobs.end() == job_it) ? NULL : &job_it->second;
     queues_mutex->unlock();
-    return job;
+    return NULL != job ? JobOption(*job) : JobOption();
 }
 
-Job* TransientQ::take(const string& queue_name)
+JobOption TransientQ::take(const string& queue_name)
 {
     queues_mutex->lock();
     Queues::iterator queue_it = queues.find(queue_name);
     Jobs::iterator job_it = queues.end() == queue_it || queue_it->second.empty() ? jobs.end() : *queue_it->second.begin();
-    Job* job = (jobs.end() == job_it) ? NULL : job_it->second;
+    Job* job = (jobs.end() == job_it) ? NULL : &job_it->second;
     queue_it->second.erase(queue_it->second.begin());
     queues_mutex->unlock();    
-    return job;    
+    return NULL != job ? JobOption(*job) : JobOption();
 }
 
-void TransientQ::push(const string& queue_name, Job* job)
+void TransientQ::push(const string& queue_name, const Job& job)
 {
     jobs_mutex->lock();
-    Jobs::iterator job_it = jobs.insert(jobs.end(), pair<string, Job*>(job->uid(), job));
+    Jobs::iterator job_it = jobs.insert(jobs.end(), pair<string, Job>(job.uid(), job));
     jobs_mutex->unlock();
     
     queues_mutex->lock();
@@ -75,64 +86,26 @@ void TransientQ::push(const string& queue_name, Job* job)
     queues_mutex->unlock();    
 }
 
-/*
-Job* TransientQ::find(const string& queue_name, const string& uid)
-{
-    Job* job = NULL;
-    queues_mutex->lock();
-    Queues::iterator queue_it = queues.find(queue_name);
-    if (queues.end() != queue_it)
-    {
-        JobsIndex* jobs_index = queue_it->second.second;
-        JobsIndex::iterator job_it = jobs_index->find(uid);
-        if (jobs_index->end() != job_it) job = *job_it->second;
-    }
-    queues_mutex->unlock();
-    return job;
-}
-*/
-
-/*
-void TransientQ::remove(const string& queue_name, const string& uid)
-{
-    queues_mutex->lock();
-    Queues::iterator queue_it = queues.find(queue_name);
-    if (queues.end() != queue_it)
-    {
-        JobsList* jobs_list = queue_it->second.first;
-        JobsIndex* jobs_index = queue_it->second.second;
-        JobsIndex::iterator job_it = jobs_index->find(uid);
-        if (jobs_index->end() != job_it)
-        {
-            // erase from index
-            jobs_index->erase(job_it);
-            // erase from list
-            jobs_list->erase(job_it->second);            
-        }
-    }
-    queues_mutex->unlock();
-}
-*/
-
-Job* TransientQ::find_job(const string& uid)
+JobOption TransientQ::find_job(const string& uid)
 {
     jobs_mutex->lock();
     Jobs::iterator job_it = jobs.find(uid);
-    Job* job = jobs.end() != job_it ? job_it->second : NULL;
+    Job* job = jobs.end() != job_it ? &job_it->second : NULL;
     jobs_mutex->unlock();
-    return job;
+    return job != NULL ? JobOption(*job) : JobOption();
 }
 
-Job* TransientQ::update_job_status(const string& uid, const JobStatus status, const string& status_description)
+JobOption TransientQ::update_job_status(const string& uid, const JobStatus status, const string& status_description)
 {
-    Job* updated_job = NULL;
+    JobOption updated_job;
     jobs_mutex->lock();
     Jobs::iterator job_it = jobs.find(uid);
     if (jobs.end() != job_it)
     {
-        updated_job = job_it->second->withStatus(status, status_description);
-        jobs.insert(jobs.end(), pair<string, Job*>(updated_job->uid(), updated_job));
+        Job new_job = job_it->second.withStatus(status, status_description);
         jobs.erase(job_it);
+        jobs.insert(jobs.end(), pair<string, Job>(new_job.uid(), new_job));        
+        updated_job = JobOption(new_job);
     }
     jobs_mutex->unlock();
     return updated_job;

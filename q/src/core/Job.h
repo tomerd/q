@@ -25,14 +25,15 @@ public:
     
     Job(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long at, unsigned long timestamp);
     Job(const string& data, const JobStatus status=JSUnknown, const unsigned long at=0);
+    Job(const Job& other);
     ~Job();
     
-    Job* withStatus(JobStatus status, const string& status_description);
+    const Job withStatus(JobStatus status, const string& status_description) const;
     
-    string const& uid() const;
-    string const& data() const;
+    const string& uid() const;
+    const string& data() const;
     JobStatus status() const;
-    string const& status_description() const;
+    const string& status_description() const;
     long at() const;
     long timestamp() const;
     
@@ -47,6 +48,22 @@ private:
     
     void init(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long at, unsigned long timestamp);
     
+};
+
+class JobOption
+{
+    
+public:
+    
+    JobOption();
+    JobOption(const Job& job);
+    bool empty();
+    const Job& get() const;
+    
+private:
+    
+    bool _empty;
+    Job _job;
 };
 
 #endif /* defined(__q__Job__) */

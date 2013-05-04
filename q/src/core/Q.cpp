@@ -33,21 +33,21 @@ void Q::disconnect()
     stop();
 }
 
-Job* Q::post(const string& queue_name, const string& data, const long at)
+const string Q::post(const string& queue_name, const string& data, const long at)
 {
-    if (!this->active) return NULL;
+    if (!this->active) return "";
     
-    Job* job = new Job(data, JSPending, at);
+    Job job = Job(data, JSPending, at);
     push(queue_name, job);
-    q_log("posted %s on %s (%s)", data.c_str(), queue_name.c_str(), job->uid().c_str());
-    return job;
+    q_log("posted [%s] on [%s] as [%s]", data.c_str(), queue_name.c_str(), job.uid().c_str());
+    return job.uid();
 }
 
 void Q::worker(const string& queue_name, WorkerDelegate delegate)
 {
     if (!this->active) return;
     
-    q_log("registering worker for %s", queue_name.c_str());
+    q_log("registering worker for [%s]", queue_name.c_str());
     verify_queue_monitor(queue_name);
     workers_mutex->lock();
     Workers::iterator it = this->workers.find(queue_name);
@@ -68,7 +68,7 @@ void Q::observer(const string& queue_name, ObserverDelegate delegate)
 {
     if (!this->active) return;
     
-    q_log("registering observer on %s", queue_name.c_str());
+    q_log("registering observer on [%s]", queue_name.c_str());
     verify_queue_monitor(queue_name);
     observers_mutex->lock();
     Observers::iterator it = this->observers.find(queue_name);
@@ -109,12 +109,14 @@ void Q::stop()
     q_log("disconnected");
 }
 
-Job* Q::handle_job_result(const string& queue_name, const Job* job, const JobError* error)
+/*
+void Q::handle_job_result(const string& queue_name, const Job& job, const JobError* error)
 {
     bool success = NULL == error;
-    q_log("job %s completed %s", job->uid().c_str(), (success ? "successfully" : "with error"));    
-    return update_job_status(job->uid(), success ? JSComplete : JSFailed, success ? "" : error->description());
+    q_log("job %s completed %s", job.uid().c_str(), (success ? "successfully" : "with error"));
+    return update_job_status(job.uid(), success ? JSComplete : JSFailed, success ? "" : error->description());
 }
+*/
 
 void Q::verify_queue_monitor(const string& queue_name)
 {
@@ -128,19 +130,19 @@ void Q::monitor_queue(Q* q, const string& queue_name)
 {    
     while (q->active)
     {
-        q_log("checking queue '%s'", queue_name.c_str());
+        //q_log("checking queue [%s]", queue_name.c_str());
         
         // find the next job
-        Job* job = NULL;        
-        unsigned long size = q->size(queue_name);        
+        JobOption job;
+        unsigned long size = q->size(queue_name);
         for (unsigned long index=0; index < size; index++)
         {
-            Job* candidate = q->take(queue_name);
-            if (NULL == candidate) continue;
+            JobOption candidate = q->take(queue_name);
+            if (candidate.empty()) continue;
             
             long now = 0;
             time(&now);            
-            if (candidate->at() <= now)
+            if (candidate.get().at() <= now)
             {
                 job = candidate;
                 break;
@@ -148,49 +150,79 @@ void Q::monitor_queue(Q* q, const string& queue_name)
             else
             {
                 // put back at end of queue
-                q->push(queue_name, candidate);
+                q->push(queue_name, candidate.get());
             }
         }
     
-        if (NULL == job)
+        if (job.empty())
         {
-            q_log("queue [%s] - no jobs", queue_name.c_str());            
+            q_log("[%s] - no jobs", queue_name.c_str());            
             sleep(1);
             continue;
         }
+        
+        string job_uid = job.get().uid();
 
         workers_mutex->lock();
         Workers::iterator workers_it = q->workers.find(queue_name);
         if (q->workers.end() == workers_it || workers_it->second.first.empty())
         {
             workers_mutex->unlock();
-            q_log("queue [%s] - no workers", queue_name.c_str());
+            q_log("[%s] - no workers", queue_name.c_str());
             // put back in queue                
-            q->push(queue_name, job);                
+            q->push(queue_name, job.get());
             sleep(1);
             continue;
         }
 
+        // update job to active
+        JobOption updated_job1 = q->update_job_status(job_uid, JSActive, "");
+        if (updated_job1.empty())
+        {
+            workers_mutex->unlock();
+            q_log("failed updating job [%s] status", job_uid.c_str());
+            // put back in queue - have not been processes yet
+            q->push(queue_name, job.get());
+            continue;
+        }
+        
         // call workers in round-rubin fashion
         JobError* job_error = NULL;
         try
         {
-            job = q->update_job_status(job->uid(), JSActive, "");
+            //q_log("[%s] running worker on [%s]", queue_name.c_str(), job_uid.c_str());
             pair<WorkersList, uint>* workers_info = &workers_it->second;
             WorkersList* workers_list = &workers_info->first;
             uint* worker_index = &workers_info->second;
             if (*worker_index >= workers_list->size()) *worker_index=0;;
             WorkerDelegate worker = workers_list->at(*worker_index);
-            worker->operator()(job, &job_error);
+            worker->operator()(&updated_job1.get(), &job_error);
             ++*worker_index;
         }
         catch (exception& e)
         {
-            q_log("queue [%s] - worker failed on [%s]. %s", queue_name.c_str(), job->uid().c_str(), e.what());
+            q_log("[%s] worker failed on [%s]. %s", queue_name.c_str(), job_uid.c_str(), e.what());
             job_error = new JobError(e.what());
         }
+        catch (...)
+        {
+            q_log("[%s] worker failed on [%s]. unknown error", queue_name.c_str(), job_uid.c_str());
+            job_error = new JobError("unknown error");
+        }
         workers_mutex->unlock();
-        job = q->handle_job_result(queue_name, job, job_error);
+
+        // update job to complete / failed
+        bool job_success = NULL == job_error;
+        JobOption updated_job2 = q->update_job_status(job_uid, job_success ? JSComplete : JSFailed, job_success ? "" : job_error->description());
+        if (updated_job2.empty())
+        {
+            // job has already been processed - only reporting issue to log
+            q_log("failed updating job [%s] status", job_uid.c_str());
+            continue;
+        }
+        
+        // job failed - no need to notify observers
+        if (!job_success) continue;
         
         // notify observers
         observers_mutex->lock();
@@ -204,14 +236,21 @@ void Q::monitor_queue(Q* q, const string& queue_name)
                 {
                     JobError* observer_error = NULL;
                     ObserverDelegate observer = *observer_it;
-                    observer->operator()(job, &observer_error);
+                    observer->operator()(&updated_job2.get(), &observer_error);
                 }
                 catch (exception& e)
                 {
-                    q_log("queue [%s] - observer failed on [%s]. %s", queue_name.c_str(), job->uid().c_str(), e.what());
+                    q_log("[%s] observer failed on [%s]. %s", queue_name.c_str(), job_uid.c_str(), e.what());
+                }
+                catch (...)
+                {
+                    q_log("[%s] observer failed on [%s]. unknown error", queue_name.c_str(), job_uid.c_str());
                 }
             }
         }
         observers_mutex->unlock();
+        //usleep(100);
     }
+    
+    //q_log("exiting queue [%s] loop", queue_name.c_str());
 }

@@ -27,8 +27,8 @@ using namespace std;
 
 //typedef function<void (Job*, JobError**)> WorkerDelegate;
 //typedef function<void (Job*, JobError**)> ObserverDelegate;
-typedef shared_ptr<function<void (Job*, JobError**)>> WorkerDelegate;
-typedef shared_ptr<function<void (Job*, JobError**)>> ObserverDelegate;
+typedef shared_ptr<function<void (const Job*, JobError**)>> WorkerDelegate;
+typedef shared_ptr<function<void (const Job*, JobError**)>> ObserverDelegate;
 
 typedef vector<WorkerDelegate> WorkersList;
 typedef vector<ObserverDelegate> ObserversList;
@@ -47,8 +47,9 @@ public:
     
     virtual bool connect();
     virtual void disconnect();
+    virtual void flush() = 0;
     
-    Job* post(const string& queue, const string& data, const long at);
+    const string post(const string& queue, const string& data, const long at);
     void worker(const string& queue, WorkerDelegate delegate);
     void observer(const string& queue, ObserverDelegate delegate);
 
@@ -63,14 +64,14 @@ protected:
     void stop();
     
     virtual unsigned long size(const string& queue) = 0;
-    virtual Job* peek(const string& queue) = 0;
-    virtual Job* take(const string& queue) = 0;
-    virtual void push(const string& queue, Job* job) = 0;
+    virtual JobOption peek(const string& queue) = 0;
+    virtual JobOption take(const string& queue) = 0;
+    virtual void push(const string& queue, const Job& job) = 0;
     //virtual Job* find(const string& queue, const string& uid) = 0;
     //virtual void remove(const string& queue, const string& uid) = 0;
     
-    virtual Job* find_job(const string& uid) = 0;
-    virtual Job* update_job_status(const string& uid, const JobStatus status, const string& status_description) = 0;
+    virtual JobOption find_job(const string& uid) = 0;
+    virtual JobOption update_job_status(const string& uid, const JobStatus status, const string& status_description) = 0;
     virtual void delete_job(const string& uid) = 0;
     
 private:
@@ -88,8 +89,7 @@ private:
         
     void verify_queue_monitor(const string& queue);
     
-    Job* handle_job_result(const string& queue, const Job* job, const JobError* error);
-    
+    //JobOption handle_job_result(const string& queue, const Job& job, const JobError* error);    
 };
 
 struct q_exception : public exception

@@ -35,13 +35,18 @@ Job::Job(const string& data, const JobStatus status, const unsigned long at)
     init(uid, data, status, "", at, 0);
 }
 
+Job::Job(const Job& other)
+{
+    init(other.uid(), other.data(), other.status(), other.status_description(), other.at(), other.timestamp());
+}
+
 Job::~Job()
 {
 }
 
-Job* Job::withStatus(JobStatus status, const string& status_description)
+const Job Job::withStatus(JobStatus status, const string& status_description) const
 {
-    return new Job(this->uid(), this->data(), status, status_description, this->at(), this->timestamp());
+    return Job(this->uid(), this->data(), status, status_description, this->at(), this->timestamp());
 }
 
 string const& Job::uid() const
@@ -89,3 +94,25 @@ string generate_job_uid()
     uuid_unparse( uuid, temp ) ;
     return temp;
 }
+
+# pragma mark - job option
+
+JobOption::JobOption() : _job(Job("", "", JSUnknown, "", 0, 0)), _empty(true)
+{
+}
+
+JobOption::JobOption(const Job& job) : _job(job), _empty(false)
+{
+}
+
+bool JobOption::empty()
+{
+    return _empty;
+}
+
+const Job& JobOption::get() const
+{
+    return _job;
+}
+
+

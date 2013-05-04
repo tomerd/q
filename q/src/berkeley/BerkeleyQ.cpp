@@ -81,6 +81,11 @@ bool BerkeleyQ::connect()
         db = NULL;
         q_error("failed connecting to berkeley. %s", e.what());
     }
+    catch (...)
+    {
+        db = NULL;
+        q_error("failed connecting to berkeley. unknown error");
+    }
     
     return (NULL != db);
 }
@@ -105,12 +110,23 @@ void BerkeleyQ::disconnect()
     }
     catch(DbException &e)
     {
-        q_error(e.what());
+        q_error("failed disconnecting from berkeley. %s", e.what());
     }
     catch(std::exception &e)
     {
-        q_error(e.what());
+        q_error("failed disconnecting from berkeley. %s", e.what());
     }
+    catch (...)
+    {
+        q_error("failed disconnecting from berkeley. unknown error");
+    }
+}
+
+void BerkeleyQ::flush()
+{
+    if (!this->active) return;
+    
+    // FIXME....    
 }
 
 #pragma mark - protected
@@ -125,21 +141,21 @@ unsigned long BerkeleyQ::size(const string& queue_name)
     return queue_size;
 }
 
-Job* BerkeleyQ::peek(const string& queue_name)
+JobOption BerkeleyQ::peek(const string& queue_name)
 {
-    if (!this->active) return NULL;
+    if (!this->active) return JobOption();
     
     DbLock lock = acquire_lock(queue_name, DB_LOCK_READ);
     vector<string> queue = load_queue_vector(queue_name);
     release_lock(&lock);
-    return !queue.empty() ? find_job(*queue.begin()) : NULL;
+    return !queue.empty() ? find_job(*queue.begin()) : JobOption();
 }
 
-Job* BerkeleyQ::take(const string& queue_name)
+JobOption BerkeleyQ::take(const string& queue_name)
 {
-    if (!active) return NULL;
+    if (!active) return JobOption();
     
-    Job* job = NULL;
+    JobOption job;
     DbLock lock = acquire_lock(queue_name, DB_LOCK_WRITE);
     vector<string> queue = load_queue_vector(queue_name);
     if (!queue.empty())
@@ -156,7 +172,7 @@ Job* BerkeleyQ::take(const string& queue_name)
     return job;
 }
 
-void BerkeleyQ::push(const string& queue_name, Job* job)
+void BerkeleyQ::push(const string& queue_name, const Job& job)
 {
     if (!this->active) return;
     
@@ -165,7 +181,7 @@ void BerkeleyQ::push(const string& queue_name, Job* job)
     DbLock lock = acquire_lock(queue_name, DB_LOCK_WRITE);
     string raw_queue = load_queue_raw(queue_name);
     raw_queue.append(" ");
-    raw_queue.append(job->uid());
+    raw_queue.append(job.uid());
     save_queue_raw(queue_name, raw_queue);
     unsigned long queue_size = load_queue_size(queue_name);
     save_queue_size(queue_name, queue_size+1);
@@ -176,51 +192,22 @@ void BerkeleyQ::push(const string& queue_name, Job* job)
     release_lock(&lock);
 }
 
-/*
-Job* BerkeleyQ::find(const string& queue_name, const string& uid)
+JobOption BerkeleyQ::find_job(const string& uid)
 {
-    if (!active) return NULL;
-    
-    DbLock lock = acquire_lock(queue_name, DB_LOCK_READ);
-    vector<string> queue = load_queue(queue_name);
-    vector<string>::iterator it = std::find(queue.begin(), queue.end(), uid);
-    release_lock(&lock);
-    return it != queue.end() ? load_job(*it) : NULL;
-}
-
-void BerkeleyQ::remove(const string& queue_name, const string& uid)
-{
-    if (!active) return;
-
-    delete_job(uid);
-    
-    DbLock lock = acquire_lock(queue_name, DB_LOCK_WRITE);
-    vector<string> queue = load_queue(queue_name);
-    vector<string>::iterator it = std::find(queue.begin(), queue.end(), uid);
-    if (it != queue.end())
-    {
-        queue.erase(it);
-        save_queue(queue_name, queue);
-        save_queue_size(queue_name, queue.size());
-    }
-    release_lock(&lock);
-}
-*/
-
-Job* BerkeleyQ::find_job(const string& uid)
-{
-    if (!this->active) return NULL;
+    if (!this->active) return JobOption();
     return load_job_record(uid);
 }
 
-Job* BerkeleyQ::update_job_status(const string& uid, const JobStatus status, const string& status_description)
+JobOption BerkeleyQ::update_job_status(const string& uid, const JobStatus status, const string& status_description)
 {
-    if (!this->active) return NULL;
+    if (!this->active) return JobOption();
     
-    Job* job = find_job(uid);
-    Job* updated_job = job->withStatus(status, status_description);
+    JobOption job = find_job(uid);
+    if (job.empty()) return JobOption();
+        
+    Job updated_job = job.get().withStatus(status, status_description);
     save_job_record(updated_job);
-    return updated_job;
+    return JobOption(updated_job);
 }
 
 void BerkeleyQ::delete_job(const string& uid)
@@ -339,16 +326,16 @@ void BerkeleyQ::save_queue_vector(const string& queue_name, vector<string> data)
     save_record(key, value, 0);
 }
 
-Job* BerkeleyQ::load_job_record(const string& uid)
+JobOption BerkeleyQ::load_job_record(const string& uid)
 {
     string key = build_job_key(uid);
     string result = load_record(key);
     return JobCodec::decode(result);
 }
 
-void BerkeleyQ::save_job_record(const Job* job)
+void BerkeleyQ::save_job_record(const Job& job)
 {
-    string key = build_job_key(job->uid());
+    string key = build_job_key(job.uid());
     string value = JobCodec::encode(job);
     save_record(key, value, DB_OVERWRITE_DUP);
 }
@@ -462,11 +449,10 @@ string build_job_key(const string& job_uid)
 
 string build_key(const char* format, ...)
 {
-    int max = 1024;
-    char* key = new char[max];
+    char key[1024];
     va_list args;
     va_start(args, format);
-    int written = vsnprintf(key, max, format, args);
+    int written = vsnprintf(key, 1024, format, args);
     key[written] = '\0';
     va_end(args);
     return key;

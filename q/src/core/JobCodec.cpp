@@ -11,22 +11,22 @@
 #include "Logger.h"
 #include "json.h"
 
-string JobCodec::encode(const Job* job)
+string JobCodec::encode(const Job& job)
 {
     Json::Value root;
     Json::StyledWriter writer;
     
-    root["uid"] = job->uid();
-    root["data"] = job->data();
-    root["status"] = job->status();
-    root["status_description"] = job->status_description();
-    root["at"] = (int)job->at();
-    root["timestamp"] = (int)job->timestamp();
+    root["uid"] = job.uid();
+    root["data"] = job.data();
+    root["status"] = job.status();
+    root["status_description"] = job.status_description();
+    root["at"] = (int)job.at();
+    root["timestamp"] = (int)job.timestamp();
     
     return writer.write(root);
 }
 
-Job* JobCodec::decode(const string& buffer)
+JobOption JobCodec::decode(const string& buffer)
 {
     Json::Value root;
     Json::Reader reader;
@@ -34,7 +34,7 @@ Job* JobCodec::decode(const string& buffer)
     if (!result || Json::objectValue != root.type())
     {
         q_error(string("invalid job json ").append(reader.getFormatedErrorMessages()));
-        return NULL;
+        return JobOption();
     }
         
     string uid = root.get("uid", "").asString();
@@ -44,5 +44,5 @@ Job* JobCodec::decode(const string& buffer)
     long at = root.get("at", 0).asInt();
     long timestamp = root.get("timestamp", 0).asInt();
                                               
-    return new Job(uid, data, status, status_description, at, timestamp);
+    return JobOption(Job(uid, data, status, status_description, at, timestamp));
 }

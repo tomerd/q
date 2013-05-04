@@ -17,7 +17,16 @@
 
 using namespace std;
 
-struct RedisConfig;
+typedef struct RedisConfig
+{
+    string host;
+    int port;
+    string prefix;
+    
+    RedisConfig(string host, int port, string prefix) : host(host), port(port), prefix(prefix)
+    {}
+    
+} RedisConfig;
 
 class RedisQ : public Q
 {
@@ -29,25 +38,26 @@ public:
     
     bool connect();
     void disconnect();
+    void flush();
     
 protected:
     
     unsigned long size(const string& queue);
-    Job* peek(const string& queue);
-    Job* take(const string& queue);
-    void push(const string& queue, Job* job);
+    JobOption peek(const string& queue);
+    JobOption take(const string& queue);
+    void push(const string& queue, const Job& job);
     //Job* find(const string& queue, const string& uid);
     //void remove(const string& queue, const string& uid);
     
-    Job* find_job(const string& uid);
-    Job* update_job_status(const string& uid, const JobStatus status, const string& status_description);
+    JobOption find_job(const string& uid);
+    JobOption update_job_status(const string& uid, const JobStatus status, const string& status_description);
     void delete_job(const string& uid);
     
 private:
     
     static mutex* redis_mutex;
     
-    RedisConfig* config;
+    RedisConfig config;
     redisContext* context;
     
     redisReply* runRedisCommand(const char* command, ...);    

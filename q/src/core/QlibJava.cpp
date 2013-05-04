@@ -9,6 +9,7 @@
 #include "QlibJava.h"
 
 #include "QFactory.h"
+#include "Logger.h"
 
 #include <list>
 
@@ -28,10 +29,10 @@ jlong Java_com_mishlabs_q_Q_native_1connect(JNIEnv* env, jobject obj, jstring jc
 {
     Q* pq = NULL;
     const char* configuration = jconfiguration != NULL ? env->GetStringUTFChars(jconfiguration, NULL) : NULL;
+    bool success = QFactory::createQ(&pq, NULL != configuration ? configuration : "");
+    if (success) success = pq->connect();
     env->ReleaseStringUTFChars(jconfiguration, configuration);
-    if (!QFactory::createQ(&pq, NULL != configuration ? configuration : "")) return 0;
-    if (!pq->connect()) return 0;
-    return (long)pq;
+    return success ? (long)pq : 0;
 }
 
 JNIEXPORT JNICALL
@@ -62,10 +63,10 @@ jstring Java_com_mishlabs_q_Q_native_1post(JNIEnv* env, jobject obj, jlong qp, j
     const char* queue = env->GetStringUTFChars(jqueue, NULL);
     const char* data = env->GetStringUTFChars(jdata, NULL);
     long at = jat;
-    Job* job = ((Q*)qp)->post(queue, data, at);
+    string uid = ((Q*)qp)->post(queue, data, at);
     env->ReleaseStringUTFChars(jqueue, queue);
     env->ReleaseStringUTFChars(jdata, data);
-    return env->NewStringUTF(job->uid().c_str());
+    return env->NewStringUTF(uid.c_str());
 }
 
 JNIEXPORT JNICALL
@@ -88,7 +89,7 @@ void Java_com_mishlabs_q_Q_native_1worker(JNIEnv* env, jobject obj, jlong qp, js
     
     const char* queue = env->GetStringUTFChars(jqueue, NULL);
     //((Q*)qp)->worker(queue, [=](Job* job, JobError** error)
-    ((Q*)qp)->worker(queue, std::shared_ptr<std::function<void (Job*, JobError** error)>>(new std::function<void (Job*, JobError**)>([=](Job* job, JobError** error)
+    ((Q*)qp)->worker(queue, WorkerDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
     {
         JavaVM* jvm = NULL;
         env->GetJavaVM(&jvm);
@@ -120,7 +121,7 @@ void Java_com_mishlabs_q_Q_native_1observer(JNIEnv* env, jobject obj, jlong qp, 
         
     const char* queue = env->GetStringUTFChars(jqueue, NULL);    
     //((Q*)qp)->observer(queue, [=](Job* job, JobError** error)
-    ((Q*)qp)->observer(queue, std::shared_ptr<std::function<void (Job*, JobError**)>>(new std::function<void (Job*, JobError**)>([=](Job* job, JobError** error)
+    ((Q*)qp)->observer(queue, ObserverDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
     {
         JavaVM* jvm = NULL;
         env->GetJavaVM(&jvm);
@@ -130,6 +131,13 @@ void Java_com_mishlabs_q_Q_native_1observer(JNIEnv* env, jobject obj, jlong qp, 
         jvm->DetachCurrentThread();
     })));
     env->ReleaseStringUTFChars(jqueue, queue);
+}
+
+JNIEXPORT JNICALL
+void Java_com_mishlabs_q_Q_native_1flush(JNIEnv* env, jobject obj, jlong qp)
+{
+    if (0 == qp) return;
+    ((Q*)qp)->flush();
 }
 
 void check_for_java_error(JNIEnv* env, JobError** error)

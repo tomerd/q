@@ -53,8 +53,13 @@ bool QFactory::createQ(Q** qp, const string& configuration)
     }
     catch (exception& e)
     {
+        *qp = NULL;        
         q_error("q initialization error. %s", e.what());
+    }
+    catch (...)
+    {
         *qp = NULL;
+        q_error("unknown q initialization error");
     }
     return (NULL != *qp);
 }

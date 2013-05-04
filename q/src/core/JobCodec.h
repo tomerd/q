@@ -19,8 +19,8 @@ class JobCodec
 {
     
 public:
-    static string encode(const Job* job);
-    static Job* decode(const string& data);
+    static string encode(const Job& job);
+    static JobOption decode(const string& data);
 };
 
 #endif /* defined(__q__JobCodec__) */

@@ -58,6 +58,15 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_mishlabs_q_Q_native_1observer
     (JNIEnv *, jobject, jlong, jstring, jobject);
     
+    /*
+     * Class:     com_mishlabs_q_Q
+     * Method:    native_flush
+     * Signature: (JL)V
+     */
+    JNIEXPORT JNICALL
+    void Java_com_mishlabs_q_Q_native_1flush
+    (JNIEnv *, jobject, jlong);
+    
 #ifdef __cplusplus
 }
 #endif

@@ -28,18 +28,19 @@ public:
     
     bool connect();
     void disconnect();
+    void flush();
     
 protected:
     
     unsigned long size(const string& queue);
-    Job* peek(const string& queue);
-    Job* take(const string& queue);
-    void push(const string& queue, Job* job);
+    JobOption peek(const string& queue);
+    JobOption take(const string& queue);
+    void push(const string& queue, const Job& job);
     //Job* find(const string& queue, const string& uid);
     //void remove(const string& queue, const string& uid);
     
-    Job* find_job(const string& uid);
-    Job* update_job_status(const string& uid, const JobStatus status, const string& status_description);
+    JobOption find_job(const string& uid);
+    JobOption update_job_status(const string& uid, const JobStatus status, const string& status_description);
     void delete_job(const string& uid);
     
 private:
@@ -59,8 +60,8 @@ private:
     vector<string> load_queue_vector(const string& queue_name);
     void save_queue_vector(const string& queue_name, const vector<string> data);
     
-    Job* load_job_record(const string& uid);
-    void save_job_record(const Job* job);
+    JobOption load_job_record(const string& uid);
+    void save_job_record(const Job& job);
     void delete_job_record(const string& uid);
     
     string load_record(const string& key);
