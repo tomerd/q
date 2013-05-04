@@ -1,6 +1,6 @@
 ***************************************************************************************
 
-This project is work in progress. if you are interested in contributing, have comments
+This project is work in progress. if you are interested in contributing or otherwise have input
 please touch base via github
 
 ***************************************************************************************
