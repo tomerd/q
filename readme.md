@@ -20,7 +20,8 @@ to use redis on your test environment and amazon SQS on production.
 ##### languages support
 * [node.js] [1]
 * [java] [2]
-* [scala] [2]
+* [scala] [3]
 	
-	[1] https://github.com/tomerd/q-node-binding
-	[2] https://github.com/tomerd/q-java-binding
+  [1]: https://github.com/tomerd/q-node-binding        "node.js"
+  [2]: https://github.com/tomerd/q-java-binding        "java"
+  [3]: https://github.com/tomerd/q-java-binding        "scala"
