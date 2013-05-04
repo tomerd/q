@@ -13,13 +13,12 @@ while during development you probably want to run it using an in-memory back-end
 to use redis on your test environment and amazon SQS on production.
 
 ##### back-ends support
-in-memory (non persistent, designed for development)
-berkeley db
-redis
+* in-memory (non persistent, designed for development)
+* berkeley db
+* redis
 
 ##### languages support
-ruby
-node.js
-java
-scala
+* node.js
+* java
+* scala
 
