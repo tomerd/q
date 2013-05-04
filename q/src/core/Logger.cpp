@@ -19,7 +19,7 @@ void q_log(const char* format, ...)
     char* message = replace_placeholders(format, args);
     va_end(args);
     mutex->lock();
-    std::clog << message << "\n";
+    std::clog << "q: " << message << "\n";
     mutex->unlock();
     delete message;
 }
@@ -31,7 +31,7 @@ void q_error(const char* format, ...)
     char* message = replace_placeholders(format, args);
     va_end(args);
     mutex->lock();
-    std::cerr << message << "\n";
+    std::cerr << "q: " << message << "\n";
     mutex->unlock();
     delete message;    
 }
