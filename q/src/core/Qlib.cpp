@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Tomer Doron. All rights reserved.
 //
 
+#include <iostream>
+
 #include "Qlib.h"
 
 #include "QFactory.h"
@@ -55,13 +57,14 @@ void q_worker(void* pq, const char* queue, void (*delegate)(const char**))
     if (NULL == pq) return;
     if (NULL == queue) return;
     if (NULL == delegate) return;
-    //((Q*)q)->worker(queue, [=](Job* job, JobError** error)
-    ((Q*)pq)->worker(queue, WorkerDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
+    
+    // TODO: manage list of workers, return some id to client and allow to remove workers based on id    
+    ((Q*)pq)->worker(queue, new WorkerDelegate([=](const Job* job, JobError** error)
     {
-        // TODO: deal with error
+        // TODO: allow client to return an error
         const char* data = job->data().c_str();
         delegate(&data);
-    })));
+    }));
 }
 
 EXPORT
@@ -70,14 +73,15 @@ void q_observer(void* pq, const char* queue, void (*delegate)(const char**))
     if (NULL == pq) return;
     if (NULL == queue) return;
     if (NULL == delegate) return;
-    //((Q*)q)->observer(queue, [=](Job* job, JobError** error)
-    ((Q*)pq)->observer(queue, ObserverDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
+    
+    // TODO: manage list of observers, return some id to client and allow to remove observer based on id
+    ((Q*)pq)->observer(queue, new ObserverDelegate([=](const Job* job, JobError** error)
     {
-        // TODO: deal with error
+        // TODO: allow client to return an error
         const char* data = job->data().c_str();
         delegate(&data);
         
-    })));
+    }));
 }
 
 EXPORT

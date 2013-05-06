@@ -54,7 +54,7 @@ JobOption TransientQ::peek(const string& queue_name)
     return NULL != job ? JobOption(*job) : JobOption();
 }
 
-JobOption TransientQ::take(const string& queue_name)
+JobOption TransientQ::pop_front(const string& queue_name)
 {
     queues_mutex->lock();
     Queues::iterator queue_it = queues.find(queue_name);
@@ -65,7 +65,7 @@ JobOption TransientQ::take(const string& queue_name)
     return NULL != job ? JobOption(*job) : JobOption();
 }
 
-void TransientQ::push(const string& queue_name, const Job& job)
+void TransientQ::push_back(const string& queue_name, const Job& job)
 {
     jobs_mutex->lock();
     Jobs::iterator job_it = jobs.insert(jobs.end(), pair<string, Job>(job.uid(), job));

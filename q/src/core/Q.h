@@ -14,8 +14,8 @@
 
 #include <iostream>
 #include <vector>
+//#include <list>
 #include <map>
-#include <thread>
 #include <thread>
 
 #include "json.h"
@@ -25,13 +25,13 @@
 
 using namespace std;
 
-//typedef function<void (Job*, JobError**)> WorkerDelegate;
-//typedef function<void (Job*, JobError**)> ObserverDelegate;
-typedef shared_ptr<function<void (const Job*, JobError**)>> WorkerDelegate;
-typedef shared_ptr<function<void (const Job*, JobError**)>> ObserverDelegate;
+//typedef function<void (const Job*, JobError**)> WorkerDelegate;
+//typedef function<void (const Job*, JobError**)> ObserverDelegate;
+typedef function<void (const Job*, JobError**)> WorkerDelegate;
+typedef function<void (const Job*, JobError**)> ObserverDelegate;
 
-typedef vector<WorkerDelegate> WorkersList;
-typedef vector<ObserverDelegate> ObserversList;
+typedef vector<shared_ptr<const WorkerDelegate>> WorkersList;
+typedef vector<shared_ptr<const ObserverDelegate>> ObserversList;
 typedef map<string, pair<WorkersList, uint>> Workers;
 typedef map<string, ObserversList> Observers;
 
@@ -50,8 +50,8 @@ public:
     virtual void flush() = 0;
     
     const string post(const string& queue, const string& data, const long at);
-    void worker(const string& queue, WorkerDelegate delegate);
-    void observer(const string& queue, ObserverDelegate delegate);
+    void worker(const string& queue, const WorkerDelegate* delegate);
+    void observer(const string& queue, const ObserverDelegate* delegate);
 
     vector<string> queues();
     
@@ -65,8 +65,8 @@ protected:
     
     virtual unsigned long size(const string& queue) = 0;
     virtual JobOption peek(const string& queue) = 0;
-    virtual JobOption take(const string& queue) = 0;
-    virtual void push(const string& queue, const Job& job) = 0;
+    virtual JobOption pop_front(const string& queue) = 0;
+    virtual void push_back(const string& queue, const Job& job) = 0;
     //virtual Job* find(const string& queue, const string& uid) = 0;
     //virtual void remove(const string& queue, const string& uid) = 0;
     

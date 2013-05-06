@@ -92,14 +92,15 @@ void Java_com_mishlabs_q_Q_native_1worker(JNIEnv* env, jobject obj, jlong qp, js
     env->GetJavaVM(&jvm);
     
     const char* queue = env->GetStringUTFChars(jqueue, NULL);
-    //((Q*)qp)->worker(queue, [=](Job* job, JobError** error)
-    ((Q*)qp)->worker(queue, WorkerDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
+    // TODO: manage list of workers, return some id to client and allow to remove workers based on id
+    ((Q*)qp)->worker(queue, new WorkerDelegate([=](const Job* job, JobError** error)
+    //((Q*)qp)->worker(queue, WorkerDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
     {
         jvm->AttachCurrentThread((void**)&env, NULL);
         env->CallVoidMethod(delegate, method, env->NewStringUTF(job->data().c_str()));
         check_for_java_error(env, error);
         jvm->DetachCurrentThread();
-    })));
+    }));
     env->ReleaseStringUTFChars(jqueue, queue);
 }
 
@@ -125,15 +126,16 @@ void Java_com_mishlabs_q_Q_native_1observer(JNIEnv* env, jobject obj, jlong qp, 
     JavaVM* jvm = NULL;
     env->GetJavaVM(&jvm);
         
-    const char* queue = env->GetStringUTFChars(jqueue, NULL);    
-    //((Q*)qp)->observer(queue, [=](Job* job, JobError** error)
-    ((Q*)qp)->observer(queue, ObserverDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
+    const char* queue = env->GetStringUTFChars(jqueue, NULL);
+    // TODO: manage list of observers, return some id to client and allow to remove observers based on id
+    ((Q*)qp)->observer(queue, new ObserverDelegate([=](const Job* job, JobError** error)
+    //((Q*)qp)->observer(queue, ObserverDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
     {
         jvm->AttachCurrentThread((void**)&env, NULL);        
         env->CallVoidMethod(delegate, method, env->NewStringUTF(job->data().c_str()));
         check_for_java_error(env, error);
         jvm->DetachCurrentThread();
-    })));
+    }));
     env->ReleaseStringUTFChars(jqueue, queue);
 }
 

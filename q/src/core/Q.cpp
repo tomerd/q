@@ -38,16 +38,16 @@ const string Q::post(const string& queue_name, const string& data, const long at
     if (!this->active) return "";
     
     Job job = Job(data, JSPending, at);
-    push(queue_name, job);
+    push_back(queue_name, job);
     q_log("posted [%s] on [%s] as [%s]", data.c_str(), queue_name.c_str(), job.uid().c_str());
     return job.uid();
 }
 
-void Q::worker(const string& queue_name, WorkerDelegate delegate)
+void Q::worker(const string& queue_name, const WorkerDelegate* delegate)
 {
     if (!this->active) return;
-    
-    q_log("registering worker for [%s]", queue_name.c_str());
+        
+    q_log("registering worker for [%s]", queue_name.c_str());        
     verify_queue_monitor(queue_name);
     workers_mutex->lock();
     Workers::iterator it = this->workers.find(queue_name);
@@ -60,11 +60,11 @@ void Q::worker(const string& queue_name, WorkerDelegate delegate)
     {
         list = &it->second.first;
     }
-    list->push_back(delegate);
+    list->push_back(shared_ptr<const WorkerDelegate>(delegate));
     workers_mutex->unlock();
 }
 
-void Q::observer(const string& queue_name, ObserverDelegate delegate)
+void Q::observer(const string& queue_name, const ObserverDelegate* delegate)
 {
     if (!this->active) return;
     
@@ -81,7 +81,7 @@ void Q::observer(const string& queue_name, ObserverDelegate delegate)
     {
         list = &it->second;
     }
-    list->push_back(delegate);
+    list->push_back(shared_ptr<const ObserverDelegate>(delegate));
     observers_mutex->unlock();
 }
 
@@ -137,7 +137,7 @@ void Q::monitor_queue(Q* q, const string& queue_name)
         unsigned long size = q->size(queue_name);
         for (unsigned long index=0; index < size; index++)
         {
-            JobOption candidate = q->take(queue_name);
+            JobOption candidate = q->pop_front(queue_name);
             if (candidate.empty()) continue;
             
             long now = 0;
@@ -149,8 +149,8 @@ void Q::monitor_queue(Q* q, const string& queue_name)
             }
             else
             {
-                // put back at end of queue
-                q->push(queue_name, candidate.get());
+                // put back in queue
+                q->push_back(queue_name, candidate.get());
             }
         }
     
@@ -170,7 +170,7 @@ void Q::monitor_queue(Q* q, const string& queue_name)
             workers_mutex->unlock();
             q_log("[%s] - no workers", queue_name.c_str());
             // put back in queue                
-            q->push(queue_name, job.get());
+            q->push_back(queue_name, job.get());
             sleep(1);
             continue;
         }
@@ -182,7 +182,7 @@ void Q::monitor_queue(Q* q, const string& queue_name)
             workers_mutex->unlock();
             q_log("failed updating job [%s] status", job_uid.c_str());
             // put back in queue - have not been processes yet
-            q->push(queue_name, job.get());
+            q->push_back(queue_name, job.get());
             continue;
         }
         
@@ -195,8 +195,8 @@ void Q::monitor_queue(Q* q, const string& queue_name)
             WorkersList* workers_list = &workers_info->first;
             uint* worker_index = &workers_info->second;
             if (*worker_index >= workers_list->size()) *worker_index=0;;
-            WorkerDelegate worker = workers_list->at(*worker_index);
-            worker->operator()(&updated_job1.get(), &job_error);
+            shared_ptr<const WorkerDelegate>& worker = workers_list->at(*worker_index);
+            worker.get()->operator()(&updated_job1.get(), &job_error);
             ++*worker_index;
         }
         catch (exception& e)
@@ -209,6 +209,7 @@ void Q::monitor_queue(Q* q, const string& queue_name)
             q_log("[%s] worker failed on [%s]. unknown error", queue_name.c_str(), job_uid.c_str());
             job_error = new JobError("unknown error");
         }
+
         workers_mutex->unlock();
 
         // update job to complete / failed
@@ -235,8 +236,8 @@ void Q::monitor_queue(Q* q, const string& queue_name)
                 try
                 {
                     JobError* observer_error = NULL;
-                    ObserverDelegate observer = *observer_it;
-                    observer->operator()(&updated_job2.get(), &observer_error);
+                    shared_ptr<const ObserverDelegate> observer = *observer_it;
+                    observer.get()->operator()(&updated_job2.get(), &observer_error);
                 }
                 catch (exception& e)
                 {
@@ -249,6 +250,7 @@ void Q::monitor_queue(Q* q, const string& queue_name)
             }
         }
         observers_mutex->unlock();
+
         //usleep(100);
     }
     

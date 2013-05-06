@@ -36,8 +36,8 @@ protected:
     
     unsigned long size(const string& queue);
     JobOption peek(const string& queue);
-    JobOption take(const string& queue);
-    void push(const string& queue, const Job& job);
+    JobOption pop_front(const string& queue);
+    void push_back(const string& queue, const Job& job);
     //Job* find(const string& queue, const string& uid);
     //void remove(const string& queue, const string& uid);
     

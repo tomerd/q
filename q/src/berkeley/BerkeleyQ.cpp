@@ -151,7 +151,7 @@ JobOption BerkeleyQ::peek(const string& queue_name)
     return !queue.empty() ? find_job(*queue.begin()) : JobOption();
 }
 
-JobOption BerkeleyQ::take(const string& queue_name)
+JobOption BerkeleyQ::pop_front(const string& queue_name)
 {
     if (!active) return JobOption();
     
@@ -172,7 +172,7 @@ JobOption BerkeleyQ::take(const string& queue_name)
     return job;
 }
 
-void BerkeleyQ::push(const string& queue_name, const Job& job)
+void BerkeleyQ::push_back(const string& queue_name, const Job& job)
 {
     if (!this->active) return;
     

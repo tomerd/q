@@ -185,7 +185,7 @@ JobOption RedisQ::peek(const string& queue_name)
     return job;
 }
 
-JobOption RedisQ::take(const string& queue_name)
+JobOption RedisQ::pop_front(const string& queue_name)
 {
     if (!this->active) return JobOption();
     
@@ -220,7 +220,7 @@ JobOption RedisQ::take(const string& queue_name)
     return job;
 }
 
-void RedisQ::push(const string& queue_name, const Job& job)
+void RedisQ::push_back(const string& queue_name, const Job& job)
 {
     if (!this->active) return;
     

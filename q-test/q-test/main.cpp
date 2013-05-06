@@ -100,7 +100,7 @@ int main(int argc, const char * argv[])
     string redis = "{ \"driver\": \"redis\", \"host\": \"127.0.0.1\" }";
     
     void* pq = NULL;
-    q_connect(&pq, redis.c_str());
+    q_connect(&pq, transient.c_str());
     if (NULL == pq) return 1;
     
     // testing only
@@ -109,8 +109,8 @@ int main(int argc, const char * argv[])
     /***************/
     test1(pq);
     //test2(pq);
-    //test3(pq, 10000, 30);
-    //test4(pq, 100000);
+    //test3(pq, 100000, 30);
+    test4(pq, 50000);
     /***************/    
     
     q_disconnect(pq);
