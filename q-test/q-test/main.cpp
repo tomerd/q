@@ -22,6 +22,7 @@ static void test3(void* q, uint total, uint wait);
 static void test4(void* q, uint total);
 static void test5(void* q);
 static void test6(void* q);
+static void test7(void* q);
 
 struct receiver
 {
@@ -131,6 +132,9 @@ int main(int argc, const char * argv[])
     
     clear(pq);
     test6(pq);
+    
+    clear(pq);
+    test7(pq);
     /***************/    
     
     q_disconnect(pq);
@@ -305,10 +309,30 @@ void test6(void* q)
     receiver::assert_recieved("test 1");
     receiver::assert_not_recieved("test 2");
     
-    time(&now);
     q_cancel(q, "test2");
     
     sleep(3);
     receiver::assert_not_recieved("test 2");
 }
 
+void test7(void* q)
+{
+    long now = 0;
+    
+    q_worker(q, "channel1", &receiver::worker1);
+    
+    time(&now);
+    q_post(q, "channel1", "test1", "test 1", now + 2);
+    q_post(q, "channel1", "test2", "test 2", now + 4);
+    
+    sleep(3);
+    receiver::assert_recieved("test 1");
+    receiver::assert_not_recieved("test 2");
+    
+    time(&now);
+    q_post(q, "channel1", "test2", "test 2 - updated", now + 2);
+    
+    sleep(3);
+    receiver::assert_not_recieved("test 2");
+    receiver::assert_recieved("test 2 - updated");    
+}

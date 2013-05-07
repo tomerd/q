@@ -268,6 +268,10 @@ JobOption RedisQ::find_job(const string& uid)
     {
         job = JobCodec::decode(reply->str);
     }
+    else if (REDIS_REPLY_NIL == reply->type)
+    {
+        // do nothing
+    }
     else
     {
         q_error("redis GET on [%s] failed. invalid reply type", key.c_str());

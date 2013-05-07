@@ -46,6 +46,12 @@ const string Q::post(const string& queue_name, const string& uid, const string& 
 {
     if (!this->active) return "";
     
+    if (!uid.empty())
+    {
+        JobOption existing = find_job(uid);
+        if (!existing.empty()) delete_job(uid);
+    }
+    
     Job job = Job(uid, data, JSPending, run_at);
     push_back(queue_name, job);
     q_log("posted [%s] on [%s] as [%s]", data.c_str(), queue_name.c_str(), job.uid().c_str());
