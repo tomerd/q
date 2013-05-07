@@ -14,11 +14,11 @@
 static long get_current_time();
 static string generate_job_uid();
 
-void Job::init(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long at, const unsigned long timestamp)
+void Job::init(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long run_at, const unsigned long timestamp)
 {
-    _uid = uid;
+    _uid = uid.empty() ? generate_job_uid() : uid;
     _data = data;
-    _at = at;
+    _run_at = run_at;
     _status = status;
     _status_description = status_description;
     _timestamp = timestamp > 0 ? timestamp : get_current_time();
@@ -29,15 +29,14 @@ Job::Job(const string& uid, const string& data, const JobStatus status, const st
     init(uid, data, status, status_description, at, timestamp);
 }
 
-Job::Job(const string& data, const JobStatus status, const unsigned long at)
-{
-    string uid = generate_job_uid();
-    init(uid, data, status, "", at, 0);
+Job::Job(const string& uid, const string& data, const JobStatus status, const unsigned long run_at)
+{    
+    init(uid, data, status, "", run_at, 0);
 }
 
 Job::Job(const Job& other)
 {
-    init(other.uid(), other.data(), other.status(), other.status_description(), other.at(), other.timestamp());
+    init(other.uid(), other.data(), other.status(), other.status_description(), other.run_at(), other.timestamp());
 }
 
 Job::~Job()
@@ -46,7 +45,12 @@ Job::~Job()
 
 const Job Job::withStatus(JobStatus status, const string& status_description) const
 {
-    return Job(this->uid(), this->data(), status, status_description, this->at(), this->timestamp());
+    return Job(this->uid(), this->data(), status, status_description, this->run_at(), this->timestamp());
+}
+
+const Job Job::withRunAt(const unsigned long run_at) const
+{
+    return Job(this->uid(), this->data(), this->status(), this->status_description(), run_at, this->timestamp());
 }
 
 string const& Job::uid() const
@@ -69,9 +73,9 @@ string const& Job::status_description() const
     return  _status_description;
 }
 
-long Job::at() const
+long Job::run_at() const
 {
-    return _at;
+    return _run_at;
 }
 
 long Job::timestamp() const

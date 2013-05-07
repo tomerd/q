@@ -295,6 +295,25 @@ JobOption RedisQ::update_job_status(const string& uid, const JobStatus status, c
     return JobOption(updated_job);
 }
 
+JobOption RedisQ::update_job_run_at(const string& uid, const long run_at)
+{
+    if (!this->active) return JobOption();
+    
+    JobOption job = find_job(uid);
+    if (job.empty()) return JobOption();
+    Job updated_job = job.get().withRunAt(run_at);
+    string key = build_job_key(updated_job.uid());
+    string job_json = JobCodec::encode(updated_job);
+    redisReply* reply = runRedisCommand("SET %s %s", key.c_str(), job_json.c_str());
+    if (NULL == reply) return JobOption();
+    if (REDIS_REPLY_STATUS != reply->type)
+    {
+        q_error("redis SET on [%s] failed. invalid reply type", key.c_str());
+    }
+    freeReplyObject(reply);
+    return JobOption(updated_job);
+}
+
 void RedisQ::delete_job(const string& uid)
 {
     if (!this->active) return;

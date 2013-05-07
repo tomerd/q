@@ -46,11 +46,10 @@ protected:
     JobOption peek(const string& queue);
     JobOption pop_front(const string& queue);
     void push_back(const string& queue, const Job& job);
-    //Job* find(const string& queue, const string& uid);
-    //void remove(const string& queue, const string& uid);
     
     JobOption find_job(const string& uid);
     JobOption update_job_status(const string& uid, const JobStatus status, const string& status_description);
+    JobOption update_job_run_at(const string& uid, const long run_at);
     void delete_job(const string& uid);
     
 private:

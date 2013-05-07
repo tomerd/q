@@ -23,18 +23,19 @@ class Job
     
 public:
     
-    Job(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long at, unsigned long timestamp);
-    Job(const string& data, const JobStatus status=JSUnknown, const unsigned long at=0);
+    Job(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long run_at, unsigned long timestamp);
+    Job(const string& xuid, const string& data, const JobStatus status=JSUnknown, const unsigned long run_at=0);
     Job(const Job& other);
     ~Job();
     
     const Job withStatus(JobStatus status, const string& status_description) const;
+    const Job withRunAt(const unsigned long run_at) const;
     
     const string& uid() const;
     const string& data() const;
     JobStatus status() const;
     const string& status_description() const;
-    long at() const;
+    long run_at() const;
     long timestamp() const;
     
 private:
@@ -43,10 +44,10 @@ private:
     string _data;
     JobStatus _status;
     string _status_description;
-    unsigned long _at;
+    unsigned long _run_at;
     unsigned long _timestamp;
     
-    void init(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long at, unsigned long timestamp);
+    void init(const string& uid, const string& data, const JobStatus status, const string& status_description, const unsigned long run_at, unsigned long timestamp);
     
 };
 

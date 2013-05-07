@@ -20,7 +20,7 @@ string JobCodec::encode(const Job& job)
     root["data"] = job.data();
     root["status"] = job.status();
     root["status_description"] = job.status_description();
-    root["at"] = (int)job.at();
+    root["run_at"] = (int)job.run_at();
     root["timestamp"] = (int)job.timestamp();
     
     return writer.write(root);
@@ -41,8 +41,8 @@ JobOption JobCodec::decode(const string& buffer)
     string data = root.get("data", "").asString();
     JobStatus status = (JobStatus)root.get("status", JSUnknown).asInt();
     string status_description = root.get("status_description", "").asString();
-    long at = root.get("at", 0).asInt();
+    long run_at = root.get("run_at", 0).asInt();
     long timestamp = root.get("timestamp", 0).asInt();
                                               
-    return JobOption(Job(uid, data, status, status_description, at, timestamp));
+    return JobOption(Job(uid, data, status, status_description, run_at, timestamp));
 }

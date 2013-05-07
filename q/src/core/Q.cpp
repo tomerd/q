@@ -31,16 +31,47 @@ bool Q::connect()
 void Q::disconnect()
 {
     stop();
+    sleep(1);
+    
+    workers_mutex->lock();
+    workers.clear();
+    workers_mutex->unlock();
+    
+    observers_mutex->lock();
+    observers.clear();
+    observers_mutex->unlock();
 }
 
-const string Q::post(const string& queue_name, const string& data, const long at)
+const string Q::post(const string& queue_name, const string& uid, const string& data, const long run_at)
 {
     if (!this->active) return "";
     
-    Job job = Job(data, JSPending, at);
+    Job job = Job(uid, data, JSPending, run_at);
     push_back(queue_name, job);
     q_log("posted [%s] on [%s] as [%s]", data.c_str(), queue_name.c_str(), job.uid().c_str());
     return job.uid();
+}
+
+bool Q::reschedule(const string& uid, const long run_at)
+{
+    JobOption job = find_job(uid);
+    if (job.empty()) return false;
+    update_job_run_at(job.get().uid(), run_at);
+    return true;
+}
+
+bool Q::cancel(const string& uid)
+{
+    JobOption job = find_job(uid);
+    if (job.empty()) return false;
+    delete_job(job.get().uid());
+    return true;
+}
+
+bool Q::exists(const string& uid)
+{
+    JobOption job = find_job(uid);
+    return !job.empty();
 }
 
 void Q::worker(const string& queue_name, const WorkerDelegate* delegate)
@@ -142,7 +173,7 @@ void Q::monitor_queue(Q* q, const string& queue_name)
             
             long now = 0;
             time(&now);            
-            if (candidate.get().at() <= now)
+            if (candidate.get().run_at() <= now)
             {
                 job = candidate;
                 break;

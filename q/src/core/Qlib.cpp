@@ -6,8 +6,6 @@
 //  Copyright (c) 2013 Tomer Doron. All rights reserved.
 //
 
-#include <iostream>
-
 #include "Qlib.h"
 
 #include "QFactory.h"
@@ -37,18 +35,34 @@ void q_disconnect(void* pq)
 }
 
 EXPORT
-void q_post(void* pq, const char* queue, const char* data, const long at, char** puid)
+void q_post(void* pq, const char* queue, const char* uid, const char* data, const long run_at, char** puid)
 {
     if (NULL == pq) return;
     if (NULL == queue) return;
     if (NULL == data) return;
-    string uid = ((Q*)pq)->post(queue, data, at);
+    string job_uid = ((Q*)pq)->post(queue, uid ? uid : "", data, run_at);
     if (NULL != puid)
     {
-        *puid = new char[uid.size()+1];
-        strcpy(*puid, uid.c_str());
-        (*puid)[uid.size()] = '\0';
+        *puid = new char[job_uid.size()+1];
+        strcpy(*puid, job_uid.c_str());
+        (*puid)[job_uid.size()] = '\0';
     }
+}
+
+EXPORT
+bool q_reschedule(void* pq, const char* uid, const long run_at)
+{    
+    if (NULL == pq) return false;
+    if (NULL == uid) return false;
+    return ((Q*)pq)->reschedule(uid, run_at);
+}
+
+EXPORT
+bool q_cancel(void* pq, const char* uid)
+{
+    if (NULL == pq) return false;
+    if (NULL == uid) return false;
+    return ((Q*)pq)->cancel(uid);
 }
 
 EXPORT

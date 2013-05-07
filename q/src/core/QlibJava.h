@@ -10,6 +10,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
     /*
      * Class:     com_mishlabs_q_Q
      * Method:    native_version
@@ -21,7 +22,7 @@ extern "C" {
     /*
      * Class:     com_mishlabs_q_Q
      * Method:    native_connect
-     * Signature: (Ljava/lang/String)J
+     * Signature: (Ljava/lang/String;)J
      */
     JNIEXPORT jlong JNICALL Java_com_mishlabs_q_Q_native_1connect
     (JNIEnv *, jobject, jstring);
@@ -37,10 +38,26 @@ extern "C" {
     /*
      * Class:     com_mishlabs_q_Q
      * Method:    native_post
-     * Signature: (JLjava/lang/String;Ljava/lang/String;J)Ljava/lang/String;
+     * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)Ljava/lang/String;
      */
     JNIEXPORT jstring JNICALL Java_com_mishlabs_q_Q_native_1post
-    (JNIEnv *, jobject, jlong, jstring, jstring, jlong);
+    (JNIEnv *, jobject, jlong, jstring, jstring, jstring, jlong);
+    
+    /*
+     * Class:     com_mishlabs_q_Q
+     * Method:    native_reschedule
+     * Signature: (JLjava/lang/String;J)Z
+     */
+    JNIEXPORT jboolean JNICALL Java_com_mishlabs_q_Q_native_1reschedule
+    (JNIEnv *, jobject, jlong, jstring, jlong);
+    
+    /*
+     * Class:     com_mishlabs_q_Q
+     * Method:    native_cancel
+     * Signature: (JLjava/lang/String;)Z
+     */
+    JNIEXPORT jboolean JNICALL Java_com_mishlabs_q_Q_native_1cancel
+    (JNIEnv *, jobject, jlong, jstring);
     
     /*
      * Class:     com_mishlabs_q_Q
@@ -61,10 +78,9 @@ extern "C" {
     /*
      * Class:     com_mishlabs_q_Q
      * Method:    native_flush
-     * Signature: (JL)V
+     * Signature: (J)V
      */
-    JNIEXPORT JNICALL
-    void Java_com_mishlabs_q_Q_native_1flush
+    JNIEXPORT void JNICALL Java_com_mishlabs_q_Q_native_1flush
     (JNIEnv *, jobject, jlong);
     
 #ifdef __cplusplus

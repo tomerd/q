@@ -49,10 +49,14 @@ public:
     virtual void disconnect();
     virtual void flush() = 0;
     
-    const string post(const string& queue, const string& data, const long at);
+    const string post(const string& queue, const string& uid, const string& data, const long run_at);
+    bool reschedule(const string& uid, const long run_at);
+    bool cancel(const string& uid);
+    bool exists(const string& uid);
+    
     void worker(const string& queue, const WorkerDelegate* delegate);
     void observer(const string& queue, const ObserverDelegate* delegate);
-
+    
     vector<string> queues();
     
 protected:    
@@ -67,11 +71,10 @@ protected:
     virtual JobOption peek(const string& queue) = 0;
     virtual JobOption pop_front(const string& queue) = 0;
     virtual void push_back(const string& queue, const Job& job) = 0;
-    //virtual Job* find(const string& queue, const string& uid) = 0;
-    //virtual void remove(const string& queue, const string& uid) = 0;
     
     virtual JobOption find_job(const string& uid) = 0;
     virtual JobOption update_job_status(const string& uid, const JobStatus status, const string& status_description) = 0;
+    virtual JobOption update_job_run_at(const string& uid, const long run_at) = 0;
     virtual void delete_job(const string& uid) = 0;
     
 private:

@@ -20,6 +20,8 @@ static void test1(void* q);
 static void test2(void* q);
 static void test3(void* q, uint total, uint wait);
 static void test4(void* q, uint total);
+static void test5(void* q);
+static void test6(void* q);
 
 struct receiver
 {
@@ -91,6 +93,13 @@ struct receiver
 vector<string> receiver::recieved_buffer = vector<string>();
 vector<string> receiver::observed_beffer = vector<string>();
 
+void clear(void* pq)
+{
+    q_flush(pq);
+    receiver::recieved_buffer.clear();
+    receiver::observed_beffer.clear();        
+}
+
 int main(int argc, const char * argv[])
 {
     cout << "testing q version " << q_version() << "\n";
@@ -103,14 +112,25 @@ int main(int argc, const char * argv[])
     q_connect(&pq, transient.c_str());
     if (NULL == pq) return 1;
     
-    // testing only
-    q_flush(pq);
     
     /***************/
-    test1(pq);
+    //clear(pq);
+    //test1(pq);
+    
+    //clear(pq);
     //test2(pq);
+    
+    //clear(pq);
     //test3(pq, 100000, 30);
-    test4(pq, 50000);
+    
+    //clear(pq);
+    //test4(pq, 50000);
+    
+    clear(pq);
+    test5(pq);
+    
+    clear(pq);
+    test6(pq);
     /***************/    
     
     q_disconnect(pq);
@@ -124,16 +144,16 @@ void test1(void* q)
 {    
     q_worker(q, "channel1", &receiver::worker1);
     
-    q_post(q, "channel1", "test 1");
-    q_post(q, "channel1", "test 2");
-    q_post(q, "channel1", "test 3");
-    q_post(q, "channel1", "test 4");
-    q_post(q, "channel1", "test 5");
-    q_post(q, "channel1", "test 6");
-    q_post(q, "channel1", "test 7");
-    q_post(q, "channel1", "test 8");
-    q_post(q, "channel1", "test 9");
-    q_post(q, "channel1", "test 10");
+    q_post(q, "channel1", NULL, "test 1");
+    q_post(q, "channel1", NULL, "test 2");
+    q_post(q, "channel1", NULL, "test 3");
+    q_post(q, "channel1", NULL, "test 4");
+    q_post(q, "channel1", NULL, "test 5");
+    q_post(q, "channel1", NULL, "test 6");
+    q_post(q, "channel1", NULL, "test 7");
+    q_post(q, "channel1", NULL, "test 8");
+    q_post(q, "channel1", NULL, "test 9");
+    q_post(q, "channel1", NULL, "test 10");
     
     sleep(2);
     receiver::assert_recieved("test 1");
@@ -162,16 +182,16 @@ void test2(void* q)
  
     
     time(&now);    
-    q_post(q, "channel1", "test 11");
-    q_post(q, "channel1", "test 12", now + 4);
-    q_post(q, "channel1", "test 13");
-    q_post(q, "channel1", "test 14", now + 6);
-    q_post(q, "channel1", "test 15");
-    q_post(q, "channel1", "test 16", now + 4);
+    q_post(q, "channel1", NULL, "test 11");
+    q_post(q, "channel1", NULL, "test 12", now + 4);
+    q_post(q, "channel1", NULL, "test 13");
+    q_post(q, "channel1", NULL, "test 14", now + 6);
+    q_post(q, "channel1", NULL, "test 15");
+    q_post(q, "channel1", NULL, "test 16", now + 4);
     
-    q_post(q, "channel2", "test 21");
-    q_post(q, "channel2", "test 22", now + 11);
-    q_post(q, "channel2", "test 23");
+    q_post(q, "channel2", NULL, "test 21");
+    q_post(q, "channel2", NULL, "test 22", now + 11);
+    q_post(q, "channel2", NULL, "test 23");
     
     sleep(2);
     receiver::assert_recieved("test 11");
@@ -190,9 +210,9 @@ void test2(void* q)
     receiver::assert_recieved("test 14");
     
     time(&now);
-    q_post(q, "channel2", "test 24");
-    q_post(q, "channel2", "test 25", now + 3);
-    q_post(q, "channel2", "test 26");
+    q_post(q, "channel2", NULL, "test 24");
+    q_post(q, "channel2", NULL, "test 25", now + 3);
+    q_post(q, "channel2", NULL, "test 26");
     
     q_worker(q, "channel2", &receiver::worker1);
 
@@ -220,7 +240,7 @@ void test3(void* q, uint total, uint wait)
         data[w] = '\0';
         
         char* uid = NULL;
-        q_post(q, "channel1", data, 0, &uid);
+        q_post(q, "channel1", NULL, data, 0, &uid);
         delete uid;
         
         delete data;
@@ -240,10 +260,55 @@ void test4(void* q, uint total)
         int w = sprintf(data, "test %d", index);
         data[w] = '\0';
         
-        char* uid = NULL;
-        q_post(q, "channel1", data, 0, &uid);
-        delete uid;
+        q_post(q, "channel1", NULL, data);
         
         delete data;        
     }
 }
+
+
+void test5(void* q)
+{
+    long now = 0;
+    
+    q_worker(q, "channel1", &receiver::worker1);
+    
+    time(&now);
+    q_post(q, "channel1", "test1", "test 1", now + 2);
+    q_post(q, "channel1", "test2", "test 2", now + 4);
+    
+    sleep(3);
+    receiver::assert_recieved("test 1");
+    receiver::assert_not_recieved("test 2");
+    
+    time(&now);
+    q_reschedule(q, "test2", now + 4);
+    
+    sleep(2);
+    receiver::assert_not_recieved("test 2");
+
+    sleep(3);
+    receiver::assert_recieved("test 2");
+}
+
+void test6(void* q)
+{
+    long now = 0;
+    
+    q_worker(q, "channel1", &receiver::worker1);
+    
+    time(&now);
+    q_post(q, "channel1", "test1", "test 1", now + 2);
+    q_post(q, "channel1", "test2", "test 2", now + 4);
+    
+    sleep(3);
+    receiver::assert_recieved("test 1");
+    receiver::assert_not_recieved("test 2");
+    
+    time(&now);
+    q_cancel(q, "test2");
+    
+    sleep(3);
+    receiver::assert_not_recieved("test 2");
+}
+

@@ -54,19 +54,45 @@ void Java_com_mishlabs_q_Q_native_1disconnect(JNIEnv* env, jobject obj, jlong qp
 }
 
 JNIEXPORT JNICALL
-jstring Java_com_mishlabs_q_Q_native_1post(JNIEnv* env, jobject obj, jlong qp, jstring jqueue, jstring jdata, jlong jat)
+jstring Java_com_mishlabs_q_Q_native_1post(JNIEnv* env, jobject obj, jlong qp, jstring jqueue, jstring juid, jstring jdata, jlong jrun_at)
 {
     if (0 == qp) return NULL;
     if (NULL == jqueue) return NULL;
     if (NULL == jdata) return NULL;
     
     const char* queue = env->GetStringUTFChars(jqueue, NULL);
+    const char* uid = NULL != juid ? env->GetStringUTFChars(juid, NULL) : NULL;
     const char* data = env->GetStringUTFChars(jdata, NULL);
-    long at = jat;
-    string uid = ((Q*)qp)->post(queue, data, at);
+    long run_at = jrun_at;
+    string new_uid = ((Q*)qp)->post(queue, uid ? uid : "", data, run_at);
     env->ReleaseStringUTFChars(jqueue, queue);
+    if (NULL != juid) env->ReleaseStringUTFChars(juid, uid);
     env->ReleaseStringUTFChars(jdata, data);
-    return env->NewStringUTF(uid.c_str());
+    return env->NewStringUTF(new_uid.c_str());
+}
+
+JNIEXPORT JNICALL
+jboolean Java_com_mishlabs_q_Q_native_1reschedule(JNIEnv* env, jobject obj, jlong qp, jstring juid, jlong jrun_at)
+{
+    if (0 == qp) return false;
+    if (NULL == juid) return false;
+    
+    const char* uid = env->GetStringUTFChars(juid, NULL);
+    long run_at = jrun_at;
+    bool result = ((Q*)qp)->reschedule(uid, run_at);
+    env->ReleaseStringUTFChars(juid, uid);
+    return result;
+}
+
+JNIEXPORT jboolean JNICALL Java_com_mishlabs_q_Q_native_1cancel(JNIEnv* env, jobject obj, jlong qp, jstring juid)
+{
+    if (0 == qp) return false;
+    if (NULL == juid) return false;
+    
+    const char* uid = env->GetStringUTFChars(juid, NULL);
+    bool result = ((Q*)qp)->cancel(uid);
+    env->ReleaseStringUTFChars(juid, uid);
+    return result;
 }
 
 // TODO: optimize this

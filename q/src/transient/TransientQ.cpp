@@ -111,6 +111,22 @@ JobOption TransientQ::update_job_status(const string& uid, const JobStatus statu
     return updated_job;
 }
 
+JobOption TransientQ::update_job_run_at(const string& uid, const long run_at)
+{
+    JobOption updated_job;
+    jobs_mutex->lock();
+    Jobs::iterator job_it = jobs.find(uid);
+    if (jobs.end() != job_it)
+    {
+        Job new_job = job_it->second.withRunAt(run_at);
+        jobs.erase(job_it);
+        jobs.insert(jobs.end(), pair<string, Job>(new_job.uid(), new_job));
+        updated_job = JobOption(new_job);
+    }
+    jobs_mutex->unlock();
+    return updated_job;
+}
+
 void TransientQ::delete_job(const string& uid)
 {
     jobs_mutex->lock();

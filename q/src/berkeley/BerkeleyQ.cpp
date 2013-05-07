@@ -210,6 +210,18 @@ JobOption BerkeleyQ::update_job_status(const string& uid, const JobStatus status
     return JobOption(updated_job);
 }
 
+JobOption BerkeleyQ::update_job_run_at(const string& uid, const long run_at)
+{
+    if (!this->active) return JobOption();
+    
+    JobOption job = find_job(uid);
+    if (job.empty()) return JobOption();
+    
+    Job updated_job = job.get().withRunAt(run_at);
+    save_job_record(updated_job);
+    return JobOption(updated_job);
+}
+
 void BerkeleyQ::delete_job(const string& uid)
 {
     if (!this->active) return;
