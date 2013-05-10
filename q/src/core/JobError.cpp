@@ -8,16 +8,19 @@
 
 #include "JobError.h"
 
-JobError::JobError(const string& description)
+namespace Q
 {
-    _description = description;
-}
+    JobError::JobError(const string& description)
+    {
+        _description = description;
+    }
 
-JobError::~JobError()
-{
-}
+    JobError::~JobError()
+    {
+    }
 
-string const& JobError::description() const
-{
-    return _description;
+    string const& JobError::description() const
+    {
+        return _description;
+    }
 }

@@ -13,19 +13,22 @@
 
 using namespace std;
 
-class JobError
+namespace Q
 {
-    
-private:
-    string _description;
-    
-public:
-    
-    JobError(const string& description);
-    ~JobError();
-    
-    string const& description() const;
-};
+    class JobError
+    {
+        
+    private:
+        string _description;
+        
+    public:
+        
+        JobError(const string& description);
+        ~JobError();
+        
+        string const& description() const;
+    };
+}
 
 
 #endif /* defined(__q__JobError__) */

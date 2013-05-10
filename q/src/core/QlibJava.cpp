@@ -16,7 +16,7 @@
 std::list<jobject> workers;
 std::list<jobject> observers;
 
-void check_for_java_error(JNIEnv* env, JobError** error);
+void check_for_java_error(JNIEnv* env, Q::JobError** error);
 
 JNIEXPORT JNICALL
 jstring Java_com_mishlabs_q_Q_native_1version(JNIEnv* env, jobject obj)
@@ -27,9 +27,9 @@ jstring Java_com_mishlabs_q_Q_native_1version(JNIEnv* env, jobject obj)
 JNIEXPORT JNICALL
 jlong Java_com_mishlabs_q_Q_native_1connect(JNIEnv* env, jobject obj, jstring jconfiguration)
 {
-    Q* pq = NULL;
+    Q::Q* pq = NULL;
     const char* configuration = jconfiguration != NULL ? env->GetStringUTFChars(jconfiguration, NULL) : NULL;
-    bool success = QFactory::createQ(&pq, NULL != configuration ? configuration : "");
+    bool success = Q::QFactory::createQ(&pq, NULL != configuration ? configuration : "");
     if (success) success = pq->connect();
     env->ReleaseStringUTFChars(jconfiguration, configuration);
     return success ? (long)pq : 0;
@@ -40,7 +40,7 @@ void Java_com_mishlabs_q_Q_native_1disconnect(JNIEnv* env, jobject obj, jlong qp
 {
     if (0 == qp) return;
     
-    ((Q*)qp)->disconnect();
+    ((Q::Q*)qp)->disconnect();
     
     for (std::list<jobject>::iterator it = workers.begin(); it != workers.end(); it++)
     {
@@ -64,7 +64,7 @@ jstring Java_com_mishlabs_q_Q_native_1post(JNIEnv* env, jobject obj, jlong qp, j
     const char* uid = NULL != juid ? env->GetStringUTFChars(juid, NULL) : NULL;
     const char* data = env->GetStringUTFChars(jdata, NULL);
     long run_at = jrun_at;
-    string new_uid = ((Q*)qp)->post(queue, uid ? uid : "", data, run_at);
+    string new_uid = ((Q::Q*)qp)->post(queue, uid ? uid : "", data, run_at);
     env->ReleaseStringUTFChars(jqueue, queue);
     if (NULL != juid) env->ReleaseStringUTFChars(juid, uid);
     env->ReleaseStringUTFChars(jdata, data);
@@ -79,7 +79,7 @@ jboolean Java_com_mishlabs_q_Q_native_1reschedule(JNIEnv* env, jobject obj, jlon
     
     const char* uid = env->GetStringUTFChars(juid, NULL);
     long run_at = jrun_at;
-    bool result = ((Q*)qp)->reschedule(uid, run_at);
+    bool result = ((Q::Q*)qp)->reschedule(uid, run_at);
     env->ReleaseStringUTFChars(juid, uid);
     return result;
 }
@@ -90,7 +90,7 @@ JNIEXPORT jboolean JNICALL Java_com_mishlabs_q_Q_native_1cancel(JNIEnv* env, job
     if (NULL == juid) return false;
     
     const char* uid = env->GetStringUTFChars(juid, NULL);
-    bool result = ((Q*)qp)->cancel(uid);
+    bool result = ((Q::Q*)qp)->cancel(uid);
     env->ReleaseStringUTFChars(juid, uid);
     return result;
 }
@@ -119,7 +119,7 @@ void Java_com_mishlabs_q_Q_native_1worker(JNIEnv* env, jobject obj, jlong qp, js
     
     const char* queue = env->GetStringUTFChars(jqueue, NULL);
     // TODO: manage list of workers, return some id to client and allow to remove workers based on id
-    ((Q*)qp)->worker(queue, new WorkerDelegate([=](const Job* job, JobError** error)
+    ((Q::Q*)qp)->worker(queue, new Q::WorkerDelegate([=](const Q::Job* job, Q::JobError** error)
     //((Q*)qp)->worker(queue, WorkerDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
     {
         jvm->AttachCurrentThread((void**)&env, NULL);
@@ -154,7 +154,7 @@ void Java_com_mishlabs_q_Q_native_1observer(JNIEnv* env, jobject obj, jlong qp, 
         
     const char* queue = env->GetStringUTFChars(jqueue, NULL);
     // TODO: manage list of observers, return some id to client and allow to remove observers based on id
-    ((Q*)qp)->observer(queue, new ObserverDelegate([=](const Job* job, JobError** error)
+    ((Q::Q*)qp)->observer(queue, new Q::ObserverDelegate([=](const Q::Job* job, Q::JobError** error)
     //((Q*)qp)->observer(queue, ObserverDelegate(new std::function<void (const Job*, JobError**)>([=](const Job* job, JobError** error)
     {
         jvm->AttachCurrentThread((void**)&env, NULL);        
@@ -169,10 +169,10 @@ JNIEXPORT JNICALL
 void Java_com_mishlabs_q_Q_native_1flush(JNIEnv* env, jobject obj, jlong qp)
 {
     if (0 == qp) return;
-    ((Q*)qp)->flush();
+    ((Q::Q*)qp)->flush();
 }
 
-void check_for_java_error(JNIEnv* env, JobError** error)
+void check_for_java_error(JNIEnv* env, Q::JobError** error)
 {
     if (JNI_TRUE != env->ExceptionCheck()) return;
     jthrowable exception = env->ExceptionOccurred();
@@ -181,7 +181,7 @@ void check_for_java_error(JNIEnv* env, JobError** error)
     jmethodID method = env->GetMethodID(klass, "toString", "()Ljava/lang/String;");
     jstring jerror = (jstring)env->CallObjectMethod(exception, method);
     const char* desccription = env->GetStringUTFChars(jerror, NULL);
-    *error = new JobError(desccription);
+    *error = new Q::JobError(desccription);
     env->ReleaseStringUTFChars(jerror, desccription);
     env->ExceptionClear();
 }

@@ -15,13 +15,16 @@
 
 using namespace std;
 
-class JobCodec
+namespace Q
 {
-    
-public:
-    static string encode(const Job& job);
-    static JobOption decode(const string& data);
-};
+    class JobCodec
+    {
+        
+    public:
+        static string encode(const Job& job);
+        static JobOption decode(const string& data);
+    };
+}
 
 #endif /* defined(__q__JobCodec__) */
 

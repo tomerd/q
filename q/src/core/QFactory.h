@@ -13,13 +13,16 @@
 
 #include "Q.h"
 
-class QFactory
+namespace Q
 {
-    
-public:
-    
-    static bool createQ(Q** pq, const string& configuration);
-    
-};
+    class QFactory
+    {
+        
+    public:
+        
+        static bool createQ(Q** pq, const string& configuration);
+        
+    };
+}
 
 #endif /* defined(__q__QFractory__) */
