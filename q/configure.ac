@@ -22,6 +22,51 @@ AS_IF([test "x$HAVE_CXX11" != "x1"],
       [AC_MSG_ERROR([** A compiler with C++11 language features is required.])])
 CXXFLAGS="$CXXFLAGS -stdlib=libc++"
 
+dnl If --with-java, make with java bindings
+AC_ARG_WITH(java,
+    [ --with-java 	  - make with java bindings (default=no) ],
+    [with_java=true])
+
+dnl check for Java support
+if test "$with_java" = "true"; then
+	if test "$JAVAC" = ""; then
+		AC_PROG_JAVAC
+	fi
+fi
+
+dnl check for JNI support
+if test "$JAVAC" = "javac"
+then
+	AC_JNI_INCLUDE_DIR
+	
+	#for JNI_INCLUDE_DIR in $JNI_INCLUDE_DIRS
+	#do
+	#	CXXFLAGS="$CXXFLAGS -I$JNI_INCLUDE_DIR"
+	#done
+	
+	AM_CONDITIONAL(Q_JNI, true)
+	
+	dnl AC_PROG_JAVAH
+	dnl AC_PATH_PROG(JAVAH,javah)
+else
+	AM_CONDITIONAL(Q_JNI, false)
+fi
+
+dnl If --with-berkeley, make with berkeley db support
+AC_ARG_WITH(berkeley,
+    [ --with-berkeley 	  - make with berkeley db support (default=no) ],
+    [with_berkeley=true])
+
+dnl check for berkeley support
+if test "$with_berkeley" = "true"; then
+	AX_BERKELEY_DB_CXX
+fi	
+if test "$DB_CXX_HEADER" = ""; then
+	AM_CONDITIONAL(Q_BERKELEY, false)
+else
+	AM_CONDITIONAL(Q_BERKELEY, true)
+fi
+
 LT_INIT
 
 AC_SUBST([Q_API_VERSION], [1.0])

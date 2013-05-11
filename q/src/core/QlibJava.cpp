@@ -1,3 +1,5 @@
+#ifdef JNI_HEADER
+
 //
 //  QlibJava.cpp
 //  q
@@ -5,6 +7,7 @@
 //  Created by Tomer Doron on 4/30/13.
 //  Copyright (c) 2013 Tomer Doron. All rights reserved.
 //
+
 
 #include "QlibJava.h"
 
@@ -185,3 +188,5 @@ void check_for_java_error(JNIEnv* env, Q::JobError** error)
     env->ReleaseStringUTFChars(jerror, desccription);
     env->ExceptionClear();
 }
+
+#endif

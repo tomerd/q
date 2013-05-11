@@ -25,6 +25,18 @@ HIREDIS_SRC = \
 3rd-party/hiredis/net.h 3rd-party/hiredis/net.c \
 3rd-party/hiredis/sds.h 3rd-party/hiredis/sds.c
 
+if Q_JNI
+JNI_SRC = core/QlibJava.h core/QlibJava.cpp
+else
+JNI_SRC = ""
+endif
+
+if Q_BERKELEY
+BERKELEY_SRC = berkeley/BerkeleyQ.h berkeley/BerkeleyQ.cpp
+else
+BERKELEY_SRC = ""
+endif
+
 libq_@Q_API_VERSION@_la_SOURCES = \
 ${JSON_SRC} \
 ${HIREDIS_SRC} \
@@ -35,10 +47,10 @@ core/Logger.h core/Logger.cpp \
 core/Q.h core/Q.cpp \
 core/QFactory.h core/QFactory.cpp \
 core/Qlib.h core/Qlib.cpp \
-core/QlibJava.h core/QlibJava.cpp \
+${JNI_SRC} \
 transient/TransientQ.h transient/TransientQ.cpp \
 redis/RedisQ.h redis/RedisQ.cpp \
-berkeley/BerkeleyQ.h berkeley/BerkeleyQ.cpp
+${BERKELEY_SRC}
 
 libq_@Q_API_VERSION@_la_LDFLAGS = -version-info $(Q_SO_VERSION)
 
