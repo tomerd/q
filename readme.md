@@ -31,12 +31,12 @@ give you this freedom and to allow you to write the code once and run it anywher
 ##### installing on osx/linux
 dependencies: libuuid-devel
 
-git clone git://github.com/tomerd/q.git
-cd q
-git submodule init
-git submodule update
-cd q
-aclocal && autoreconf -i && automake
-./configure
-make && make install
+	git clone git://github.com/tomerd/q.git
+	cd q
+	git submodule init
+	git submodule update
+	cd q
+	aclocal && autoreconf -i && automake
+	./configure
+	make && make install
 
