@@ -29,10 +29,13 @@ give you this freedom and to allow you to write the code once and run it anywher
   [3]: https://github.com/tomerd/q-java-binding        "java/scala"
 
 ##### installing on linux
-
 git clone git://github.com/tomerd/q.git
+
 cd q/q
+
 aclocal && autoconf -i && automake
+
 ./configure
+
 make
 
