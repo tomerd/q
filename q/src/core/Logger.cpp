@@ -8,6 +8,7 @@
 
 #include <mutex>
 #include <cstdarg>
+#include <cstring>
 
 #include "Logger.h"
 
