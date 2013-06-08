@@ -28,14 +28,10 @@ give you this freedom and to allow you to write the code once and run it anywher
   [2]: https://github.com/tomerd/q-node-binding        "node.js"
   [3]: https://github.com/tomerd/q-java-binding        "java/scala"
 
-##### installing on linux
+##### installing on linux / osx
 git clone git://github.com/tomerd/q.git
-
 cd q/q
-
-aclocal && autoconf -i && automake
-
+aclocal && autoreconf -i && automake
 ./configure
-
-make
+make && make install
 
