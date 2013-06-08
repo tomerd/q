@@ -7,6 +7,7 @@
 //
 
 #include <mutex>
+#include <cstdarg>
 
 #include "RedisQ.h"
 

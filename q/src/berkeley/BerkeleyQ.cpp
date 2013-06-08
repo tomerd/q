@@ -14,6 +14,7 @@
 
 #include <sstream>
 #include <algorithm>
+#include <cstdarg>
 
 #include "../core/JobCodec.h"
 #include "../core/Logger.h"

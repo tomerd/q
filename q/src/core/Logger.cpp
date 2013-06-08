@@ -6,8 +6,10 @@
 //  Copyright (c) 2013 Tomer Doron. All rights reserved.
 //
 
-#include "Logger.h"
 #include <mutex>
+#include <cstdarg>
+
+#include "Logger.h"
 
 namespace Q
 {
