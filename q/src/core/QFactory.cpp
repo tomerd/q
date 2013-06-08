@@ -11,7 +11,7 @@
 
 #include "QFactory.h"
 
-#include "../3rd-party/json/Json.h"
+#include "../3rd-party/json/json.h"
 #include "Logger.h"
 
 #include "../transient/TransientQ.h"
