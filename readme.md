@@ -28,9 +28,14 @@ give you this freedom and to allow you to write the code once and run it anywher
   [2]: https://github.com/tomerd/q-node-binding        "node.js"
   [3]: https://github.com/tomerd/q-java-binding        "java/scala"
 
-##### installing on linux / osx
+##### installing on osx/linux
+dependencies: libuuid-devel
+
 git clone git://github.com/tomerd/q.git
-cd q/q
+cd q
+git submodule init
+git submodule update
+cd q
 aclocal && autoreconf -i && automake
 ./configure
 make && make install
