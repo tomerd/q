@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Tomer Doron. All rights reserved.
 //
 
+#include <cstring>
+
 #include "Qlib.h"
 
 #include "QFactory.h"
