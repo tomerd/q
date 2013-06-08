@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Tomer Doron. All rights reserved.
 //
 
+#include <mutex>
+
 #include "RedisQ.h"
 
 #include "../3rd-party/json/json.h"

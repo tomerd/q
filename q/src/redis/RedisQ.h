@@ -10,6 +10,7 @@
 #define __q__RedisQ__
 
 #include <iostream>
+#include <mutex>
 
 #include "../core/Q.h"
 // FIXME: use better linking & header inclusion stratgey

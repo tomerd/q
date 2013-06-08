@@ -9,6 +9,7 @@
 #include "Q.h"
 
 #include <unistd.h>
+#include <mutex>
 #include "Logger.h"
 
 namespace Q

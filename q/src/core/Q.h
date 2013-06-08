@@ -17,6 +17,7 @@
 //#include <list>
 #include <map>
 #include <thread>
+#include <mutex>
 
 #include "../3rd-party/json/json.h"
 

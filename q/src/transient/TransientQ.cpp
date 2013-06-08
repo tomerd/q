@@ -8,6 +8,7 @@
 
 #include "TransientQ.h"
 
+#include <mutex>
 #include <algorithm>
 
 namespace Q

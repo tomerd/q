@@ -7,6 +7,7 @@
 //
 
 #include "Logger.h"
+#include <mutex>
 
 namespace Q
 {
