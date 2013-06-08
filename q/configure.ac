@@ -10,7 +10,8 @@ AM_INIT_AUTOMAKE([1.10 -Wall no-define])
 
 AC_CONFIG_HEADERS([config.h])
 
-AM_PROG_AR
+#AM_PROG_AR
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 AC_LANG([C++])
 AM_PROG_CC_C_O
