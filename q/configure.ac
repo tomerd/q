@@ -17,11 +17,16 @@ AC_LANG([C++])
 AM_PROG_CC_C_O
 AC_PROG_CXX([clang++ g++])
 
+AC_CHECK_PROG([USING_CLANG], [clang++], [yes], [no])
+
 dnl check for C++11 support
 AX_CXX_COMPILE_STDCXX_11([noext])
 AS_IF([test "x$HAVE_CXX11" != "x1"],
       [AC_MSG_ERROR([** A compiler with C++11 language features is required.])])
-CXXFLAGS="$CXXFLAGS -stdlib=libc++"
+
+if test "$USING_CLANG" = "yes"; then
+	CXXFLAGS="$CXXFLAGS -stdlib=libc++"
+fi
 
 dnl If --with-java, make with java bindings
 AC_ARG_WITH(java,
