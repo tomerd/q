@@ -15,6 +15,8 @@
 #include "Logger.h"
 
 #include "../transient/TransientQ.h"
+
+#include "../kyotocabinet/KyotoCabinetQ.h"
 #include "../redis/RedisQ.h"
 
 #ifdef DB_CXX_HEADER
@@ -28,6 +30,7 @@ namespace Q
         QTUndefined,
         QTTransient,
         QTBerkeley,
+        QTKyotoCabinet,
         QTRedis
     } QType;
 
@@ -54,6 +57,9 @@ namespace Q
                     *qp = new BerkeleyQ(json_config);
                     break;
 #endif
+                case QTKyotoCabinet:
+                    *qp = new KyotoCabinetQ(json_config);
+                    break;
                 case QTRedis:
                     *qp = new RedisQ(json_config);
                     break;
@@ -80,6 +86,7 @@ namespace Q
         if (driver.empty()) return QTUndefined;
         if (iequals(driver, "transient")) return QTTransient;
         if (iequals(driver, "berkeley")) return QTBerkeley;
+        if (iequals(driver, "qc")) return QTKyotoCabinet;
         if (iequals(driver, "redis")) return QTRedis;
         return QTUndefined;
     }

@@ -107,16 +107,17 @@ int main(int argc, const char * argv[])
 
     string transient = "";
     string berkeley = "{ \"driver\": \"berkeley\" }";
+    string qc = "{ \"driver\": \"qc\" }";
     string redis = "{ \"driver\": \"redis\", \"host\": \"127.0.0.1\" }";
     
     void* pq = NULL;
-    q_connect(&pq, transient.c_str());
+    q_connect(&pq, qc.c_str());
     if (NULL == pq) return 1;
     
     
     /***************/
-    //clear(pq);
-    //test1(pq);
+    clear(pq);
+    test1(pq);
     
     //clear(pq);
     //test2(pq);
@@ -127,14 +128,14 @@ int main(int argc, const char * argv[])
     //clear(pq);
     //test4(pq, 50000);
     
-    clear(pq);
-    test5(pq);
+    //clear(pq);
+    //test5(pq);
     
-    clear(pq);
-    test6(pq);
+    //clear(pq);
+    //test6(pq);
     
-    clear(pq);
-    test7(pq);
+    //clear(pq);
+    //test7(pq);
     /***************/    
     
     q_disconnect(pq);
@@ -159,7 +160,7 @@ void test1(void* q)
     q_post(q, "channel1", NULL, "test 9");
     q_post(q, "channel1", NULL, "test 10");
     
-    sleep(2);
+    sleep(2000);
     receiver::assert_recieved("test 1");
     receiver::assert_recieved("test 2");
     receiver::assert_recieved("test 3");

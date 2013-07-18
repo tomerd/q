@@ -7,6 +7,45 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F132B15D179748E000468FE9 /* kccachedb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B0EC179748E000468FE9 /* kccachedb.cc */; };
+		F132B15E179748E000468FE9 /* kccachedb.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B0ED179748E000468FE9 /* kccachedb.h */; };
+		F132B160179748E000468FE9 /* kccommon.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B0EF179748E000468FE9 /* kccommon.h */; };
+		F132B161179748E000468FE9 /* kccompare.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B0F0179748E000468FE9 /* kccompare.cc */; };
+		F132B162179748E000468FE9 /* kccompare.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B0F1179748E000468FE9 /* kccompare.h */; };
+		F132B163179748E000468FE9 /* kccompress.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B0F2179748E000468FE9 /* kccompress.cc */; };
+		F132B164179748E000468FE9 /* kccompress.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B0F3179748E000468FE9 /* kccompress.h */; };
+		F132B165179748E000468FE9 /* kcdb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B0F4179748E000468FE9 /* kcdb.cc */; };
+		F132B166179748E000468FE9 /* kcdb.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B0F5179748E000468FE9 /* kcdb.h */; };
+		F132B167179748E000468FE9 /* kcdbext.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B0F6179748E000468FE9 /* kcdbext.cc */; };
+		F132B168179748E000468FE9 /* kcdbext.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B0F7179748E000468FE9 /* kcdbext.h */; };
+		F132B169179748E000468FE9 /* kcdirdb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B0F8179748E000468FE9 /* kcdirdb.cc */; };
+		F132B16A179748E000468FE9 /* kcdirdb.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B0F9179748E000468FE9 /* kcdirdb.h */; };
+		F132B16D179748E000468FE9 /* kcfile.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B0FC179748E000468FE9 /* kcfile.cc */; };
+		F132B16E179748E000468FE9 /* kcfile.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B0FD179748E000468FE9 /* kcfile.h */; };
+		F132B172179748E000468FE9 /* kchashdb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B101179748E000468FE9 /* kchashdb.cc */; };
+		F132B173179748E000468FE9 /* kchashdb.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B102179748E000468FE9 /* kchashdb.h */; };
+		F132B176179748E000468FE9 /* kclangc.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B105179748E000468FE9 /* kclangc.cc */; };
+		F132B177179748E000468FE9 /* kclangc.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B106179748E000468FE9 /* kclangc.h */; };
+		F132B179179748E000468FE9 /* kcmap.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B108179748E000468FE9 /* kcmap.cc */; };
+		F132B17A179748E000468FE9 /* kcmap.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B109179748E000468FE9 /* kcmap.h */; };
+		F132B17B179748E000468FE9 /* kcplantdb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B10A179748E000468FE9 /* kcplantdb.cc */; };
+		F132B17C179748E000468FE9 /* kcplantdb.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B10B179748E000468FE9 /* kcplantdb.h */; };
+		F132B17D179748E000468FE9 /* kcpolydb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B10C179748E000468FE9 /* kcpolydb.cc */; };
+		F132B17E179748E000468FE9 /* kcpolydb.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B10D179748E000468FE9 /* kcpolydb.h */; };
+		F132B181179748E000468FE9 /* kcprotodb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B110179748E000468FE9 /* kcprotodb.cc */; };
+		F132B182179748E000468FE9 /* kcprotodb.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B111179748E000468FE9 /* kcprotodb.h */; };
+		F132B184179748E000468FE9 /* kcregex.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B113179748E000468FE9 /* kcregex.cc */; };
+		F132B185179748E000468FE9 /* kcregex.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B114179748E000468FE9 /* kcregex.h */; };
+		F132B186179748E000468FE9 /* kcstashdb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B115179748E000468FE9 /* kcstashdb.cc */; };
+		F132B187179748E000468FE9 /* kcstashdb.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B116179748E000468FE9 /* kcstashdb.h */; };
+		F132B189179748E000468FE9 /* kctextdb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B118179748E000468FE9 /* kctextdb.cc */; };
+		F132B18A179748E000468FE9 /* kctextdb.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B119179748E000468FE9 /* kctextdb.h */; };
+		F132B18B179748E000468FE9 /* kcthread.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B11A179748E000468FE9 /* kcthread.cc */; };
+		F132B18C179748E000468FE9 /* kcthread.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B11B179748E000468FE9 /* kcthread.h */; };
+		F132B18F179748E000468FE9 /* kcutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = F132B11E179748E000468FE9 /* kcutil.cc */; };
+		F132B190179748E000468FE9 /* kcutil.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B11F179748E000468FE9 /* kcutil.h */; };
+		F132B1991797497900468FE9 /* KyotoCabinetQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F132B1971797497900468FE9 /* KyotoCabinetQ.cpp */; };
+		F132B19A1797497900468FE9 /* KyotoCabinetQ.h in Headers */ = {isa = PBXBuildFile; fileRef = F132B1981797497900468FE9 /* KyotoCabinetQ.h */; };
 		F18B485C1730DC4700C44412 /* libdb_cxx-5.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F18B485B1730DC4700C44412 /* libdb_cxx-5.3.dylib */; };
 		F1ADE8AF1731C6D500A8FC40 /* JobCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1ADE8AD1731C6D500A8FC40 /* JobCodec.cpp */; };
 		F1ADE8B01731C6D500A8FC40 /* JobCodec.h in Headers */ = {isa = PBXBuildFile; fileRef = F1ADE8AE1731C6D500A8FC40 /* JobCodec.h */; };
@@ -59,6 +98,45 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F132B0EC179748E000468FE9 /* kccachedb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kccachedb.cc; sourceTree = "<group>"; };
+		F132B0ED179748E000468FE9 /* kccachedb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kccachedb.h; sourceTree = "<group>"; };
+		F132B0EF179748E000468FE9 /* kccommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kccommon.h; sourceTree = "<group>"; };
+		F132B0F0179748E000468FE9 /* kccompare.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kccompare.cc; sourceTree = "<group>"; };
+		F132B0F1179748E000468FE9 /* kccompare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kccompare.h; sourceTree = "<group>"; };
+		F132B0F2179748E000468FE9 /* kccompress.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kccompress.cc; sourceTree = "<group>"; };
+		F132B0F3179748E000468FE9 /* kccompress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kccompress.h; sourceTree = "<group>"; };
+		F132B0F4179748E000468FE9 /* kcdb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcdb.cc; sourceTree = "<group>"; };
+		F132B0F5179748E000468FE9 /* kcdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcdb.h; sourceTree = "<group>"; };
+		F132B0F6179748E000468FE9 /* kcdbext.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcdbext.cc; sourceTree = "<group>"; };
+		F132B0F7179748E000468FE9 /* kcdbext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcdbext.h; sourceTree = "<group>"; };
+		F132B0F8179748E000468FE9 /* kcdirdb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcdirdb.cc; sourceTree = "<group>"; };
+		F132B0F9179748E000468FE9 /* kcdirdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcdirdb.h; sourceTree = "<group>"; };
+		F132B0FC179748E000468FE9 /* kcfile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcfile.cc; sourceTree = "<group>"; };
+		F132B0FD179748E000468FE9 /* kcfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcfile.h; sourceTree = "<group>"; };
+		F132B101179748E000468FE9 /* kchashdb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kchashdb.cc; sourceTree = "<group>"; };
+		F132B102179748E000468FE9 /* kchashdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kchashdb.h; sourceTree = "<group>"; };
+		F132B105179748E000468FE9 /* kclangc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kclangc.cc; sourceTree = "<group>"; };
+		F132B106179748E000468FE9 /* kclangc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kclangc.h; sourceTree = "<group>"; };
+		F132B108179748E000468FE9 /* kcmap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcmap.cc; sourceTree = "<group>"; };
+		F132B109179748E000468FE9 /* kcmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcmap.h; sourceTree = "<group>"; };
+		F132B10A179748E000468FE9 /* kcplantdb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcplantdb.cc; sourceTree = "<group>"; };
+		F132B10B179748E000468FE9 /* kcplantdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcplantdb.h; sourceTree = "<group>"; };
+		F132B10C179748E000468FE9 /* kcpolydb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcpolydb.cc; sourceTree = "<group>"; };
+		F132B10D179748E000468FE9 /* kcpolydb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcpolydb.h; sourceTree = "<group>"; };
+		F132B110179748E000468FE9 /* kcprotodb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcprotodb.cc; sourceTree = "<group>"; };
+		F132B111179748E000468FE9 /* kcprotodb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcprotodb.h; sourceTree = "<group>"; };
+		F132B113179748E000468FE9 /* kcregex.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcregex.cc; sourceTree = "<group>"; };
+		F132B114179748E000468FE9 /* kcregex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcregex.h; sourceTree = "<group>"; };
+		F132B115179748E000468FE9 /* kcstashdb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcstashdb.cc; sourceTree = "<group>"; };
+		F132B116179748E000468FE9 /* kcstashdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcstashdb.h; sourceTree = "<group>"; };
+		F132B118179748E000468FE9 /* kctextdb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kctextdb.cc; sourceTree = "<group>"; };
+		F132B119179748E000468FE9 /* kctextdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kctextdb.h; sourceTree = "<group>"; };
+		F132B11A179748E000468FE9 /* kcthread.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcthread.cc; sourceTree = "<group>"; };
+		F132B11B179748E000468FE9 /* kcthread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcthread.h; sourceTree = "<group>"; };
+		F132B11E179748E000468FE9 /* kcutil.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kcutil.cc; sourceTree = "<group>"; };
+		F132B11F179748E000468FE9 /* kcutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcutil.h; sourceTree = "<group>"; };
+		F132B1971797497900468FE9 /* KyotoCabinetQ.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KyotoCabinetQ.cpp; sourceTree = "<group>"; };
+		F132B1981797497900468FE9 /* KyotoCabinetQ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KyotoCabinetQ.h; sourceTree = "<group>"; };
 		F18B485B1730DC4700C44412 /* libdb_cxx-5.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libdb_cxx-5.3.dylib"; path = "../../../../../../usr/local/lib/libdb_cxx-5.3.dylib"; sourceTree = "<group>"; };
 		F1ADE8AD1731C6D500A8FC40 /* JobCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JobCodec.cpp; sourceTree = "<group>"; };
 		F1ADE8AE1731C6D500A8FC40 /* JobCodec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JobCodec.h; sourceTree = "<group>"; };
@@ -126,6 +204,59 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F132AFC7179748DD00468FE9 /* kyotocabinet */ = {
+			isa = PBXGroup;
+			children = (
+				F132B0EC179748E000468FE9 /* kccachedb.cc */,
+				F132B0ED179748E000468FE9 /* kccachedb.h */,
+				F132B0EF179748E000468FE9 /* kccommon.h */,
+				F132B0F0179748E000468FE9 /* kccompare.cc */,
+				F132B0F1179748E000468FE9 /* kccompare.h */,
+				F132B0F2179748E000468FE9 /* kccompress.cc */,
+				F132B0F3179748E000468FE9 /* kccompress.h */,
+				F132B0F4179748E000468FE9 /* kcdb.cc */,
+				F132B0F5179748E000468FE9 /* kcdb.h */,
+				F132B0F6179748E000468FE9 /* kcdbext.cc */,
+				F132B0F7179748E000468FE9 /* kcdbext.h */,
+				F132B0F8179748E000468FE9 /* kcdirdb.cc */,
+				F132B0F9179748E000468FE9 /* kcdirdb.h */,
+				F132B0FC179748E000468FE9 /* kcfile.cc */,
+				F132B0FD179748E000468FE9 /* kcfile.h */,
+				F132B101179748E000468FE9 /* kchashdb.cc */,
+				F132B102179748E000468FE9 /* kchashdb.h */,
+				F132B105179748E000468FE9 /* kclangc.cc */,
+				F132B106179748E000468FE9 /* kclangc.h */,
+				F132B108179748E000468FE9 /* kcmap.cc */,
+				F132B109179748E000468FE9 /* kcmap.h */,
+				F132B10A179748E000468FE9 /* kcplantdb.cc */,
+				F132B10B179748E000468FE9 /* kcplantdb.h */,
+				F132B10C179748E000468FE9 /* kcpolydb.cc */,
+				F132B10D179748E000468FE9 /* kcpolydb.h */,
+				F132B110179748E000468FE9 /* kcprotodb.cc */,
+				F132B111179748E000468FE9 /* kcprotodb.h */,
+				F132B113179748E000468FE9 /* kcregex.cc */,
+				F132B114179748E000468FE9 /* kcregex.h */,
+				F132B115179748E000468FE9 /* kcstashdb.cc */,
+				F132B116179748E000468FE9 /* kcstashdb.h */,
+				F132B118179748E000468FE9 /* kctextdb.cc */,
+				F132B119179748E000468FE9 /* kctextdb.h */,
+				F132B11A179748E000468FE9 /* kcthread.cc */,
+				F132B11B179748E000468FE9 /* kcthread.h */,
+				F132B11E179748E000468FE9 /* kcutil.cc */,
+				F132B11F179748E000468FE9 /* kcutil.h */,
+			);
+			path = kyotocabinet;
+			sourceTree = "<group>";
+		};
+		F132B1961797495400468FE9 /* kyotocabinet */ = {
+			isa = PBXGroup;
+			children = (
+				F132B1981797497900468FE9 /* KyotoCabinetQ.h */,
+				F132B1971797497900468FE9 /* KyotoCabinetQ.cpp */,
+			);
+			path = kyotocabinet;
+			sourceTree = "<group>";
+		};
 		F18B485A1730DC0E00C44412 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -148,6 +279,7 @@
 			children = (
 				F1ADE8DF173238C000A8FC40 /* json */,
 				F1CBDE1617333DDD00F09841 /* hiredis */,
+				F132AFC7179748DD00468FE9 /* kyotocabinet */,
 			);
 			path = "3rd-party";
 			sourceTree = "<group>";
@@ -197,6 +329,7 @@
 				F1BD77FB172D0C64007F9B4D /* core */,
 				F1BD7806172D0C64007F9B4D /* transient */,
 				F1ADE8D9173238A100A8FC40 /* berkeley */,
+				F132B1961797495400468FE9 /* kyotocabinet */,
 				F1BD7805172D0C64007F9B4D /* redis */,
 				F1ADE8DE173238C000A8FC40 /* 3rd-party */,
 			);
@@ -310,6 +443,26 @@
 				F1CBDE3C17333DFA00F09841 /* hiredis.h in Headers */,
 				F1CBDE3F17333DFA00F09841 /* net.h in Headers */,
 				F1CBDE4117333DFA00F09841 /* sds.h in Headers */,
+				F132B15E179748E000468FE9 /* kccachedb.h in Headers */,
+				F132B160179748E000468FE9 /* kccommon.h in Headers */,
+				F132B162179748E000468FE9 /* kccompare.h in Headers */,
+				F132B164179748E000468FE9 /* kccompress.h in Headers */,
+				F132B166179748E000468FE9 /* kcdb.h in Headers */,
+				F132B168179748E000468FE9 /* kcdbext.h in Headers */,
+				F132B16A179748E000468FE9 /* kcdirdb.h in Headers */,
+				F132B16E179748E000468FE9 /* kcfile.h in Headers */,
+				F132B173179748E000468FE9 /* kchashdb.h in Headers */,
+				F132B177179748E000468FE9 /* kclangc.h in Headers */,
+				F132B17A179748E000468FE9 /* kcmap.h in Headers */,
+				F132B17C179748E000468FE9 /* kcplantdb.h in Headers */,
+				F132B17E179748E000468FE9 /* kcpolydb.h in Headers */,
+				F132B182179748E000468FE9 /* kcprotodb.h in Headers */,
+				F132B185179748E000468FE9 /* kcregex.h in Headers */,
+				F132B187179748E000468FE9 /* kcstashdb.h in Headers */,
+				F132B18A179748E000468FE9 /* kctextdb.h in Headers */,
+				F132B18C179748E000468FE9 /* kcthread.h in Headers */,
+				F132B190179748E000468FE9 /* kcutil.h in Headers */,
+				F132B19A1797497900468FE9 /* KyotoCabinetQ.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,6 +536,25 @@
 				F1CBDE3B17333DFA00F09841 /* hiredis.c in Sources */,
 				F1CBDE3E17333DFA00F09841 /* net.c in Sources */,
 				F1CBDE4017333DFA00F09841 /* sds.c in Sources */,
+				F132B15D179748E000468FE9 /* kccachedb.cc in Sources */,
+				F132B161179748E000468FE9 /* kccompare.cc in Sources */,
+				F132B163179748E000468FE9 /* kccompress.cc in Sources */,
+				F132B165179748E000468FE9 /* kcdb.cc in Sources */,
+				F132B167179748E000468FE9 /* kcdbext.cc in Sources */,
+				F132B169179748E000468FE9 /* kcdirdb.cc in Sources */,
+				F132B16D179748E000468FE9 /* kcfile.cc in Sources */,
+				F132B172179748E000468FE9 /* kchashdb.cc in Sources */,
+				F132B176179748E000468FE9 /* kclangc.cc in Sources */,
+				F132B179179748E000468FE9 /* kcmap.cc in Sources */,
+				F132B17B179748E000468FE9 /* kcplantdb.cc in Sources */,
+				F132B17D179748E000468FE9 /* kcpolydb.cc in Sources */,
+				F132B181179748E000468FE9 /* kcprotodb.cc in Sources */,
+				F132B184179748E000468FE9 /* kcregex.cc in Sources */,
+				F132B186179748E000468FE9 /* kcstashdb.cc in Sources */,
+				F132B189179748E000468FE9 /* kctextdb.cc in Sources */,
+				F132B18B179748E000468FE9 /* kcthread.cc in Sources */,
+				F132B18F179748E000468FE9 /* kcutil.cc in Sources */,
+				F132B1991797497900468FE9 /* KyotoCabinetQ.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
