@@ -129,11 +129,10 @@ namespace Q
         }
     }
 
+    // FIXME: implement this
     void BerkeleyQ::flush()
     {
         if (!this->active) return;
-        
-        // FIXME....    
     }
 
     #pragma mark - protected
