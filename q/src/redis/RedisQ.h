@@ -64,11 +64,6 @@ namespace Q
         
         redisReply* runRedisCommand(const char* command, ...);    
         //void handle_reply_error();
-        
-        string build_queue_key(const string& queue_name);
-        string build_queue_size_key(const string& queue_name);
-        string build_job_key(const string& job_uid);
-        
     };
 }
 

@@ -17,8 +17,12 @@
 
 namespace Q
 {
-    static string build_key(const char* format, ...);
     static RedisConfig parse_config(const Json::Value& configuration);
+    
+    static string build_queue_key(const string& prefix, const string& queue_name);
+    static string build_queue_size_key(const string& prefix, const string& queue_name);
+    static string build_job_key(const string& prefix, const string& job_uid);
+    static string build_key(const char* format, ...);
 
     mutex* RedisQ::redis_mutex = new mutex();
 
@@ -78,13 +82,14 @@ namespace Q
         }
     }
 
+    // FIXME: find a better way to do this
     void RedisQ::flush()
     {
         if (!this->active) return;
         
         vector<string> keys;
         
-        string queue_size_key = build_queue_size_key("*");
+        string queue_size_key = build_queue_size_key(this->config.prefix, "*");
         redisReply* reply1 = runRedisCommand("KEYS %s", queue_size_key.c_str());
         if (NULL == reply1) return;
         if (REDIS_REPLY_ARRAY != reply1->type)
@@ -98,7 +103,7 @@ namespace Q
             keys.push_back(((redisReply*)reply1->element[index])->str);
         }
         
-        string queue_key = build_queue_key("*");
+        string queue_key = build_queue_key(this->config.prefix, "*");
         redisReply* reply2 = runRedisCommand("KEYS %s", queue_key.c_str());
         if (NULL == reply2) return;
         if (REDIS_REPLY_ARRAY != reply2->type)
@@ -112,7 +117,7 @@ namespace Q
             keys.push_back(((redisReply*)reply2->element[index])->str);
         }
         
-        string job_key = build_job_key("*");
+        string job_key = build_job_key(this->config.prefix, "*");
         redisReply* reply3 = runRedisCommand("KEYS %s", job_key.c_str());
         if (NULL == reply3) return;
         if (REDIS_REPLY_ARRAY != reply3->type)
@@ -148,14 +153,14 @@ namespace Q
     {
         if (!this->active) return -1;
         
-        unsigned long size = 0;
-        string key = build_queue_size_key(queue_name);
+        unsigned long result = 0;
+        string key = build_queue_size_key(this->config.prefix, queue_name);
         redisReply* reply = runRedisCommand("GET %s", key.c_str());
         if (NULL == reply) return 0;
         if (REDIS_REPLY_STRING == reply->type)
         {
             char* end;
-            size = strtol(reply->str, &end, 10);
+            result = strtol(reply->str, &end, 10);
             if (end == reply->str || *end != '\0' || errno == ERANGE)
             {
                 q_error("redis GET on [%s] failed. invalid value", key.c_str());
@@ -166,7 +171,7 @@ namespace Q
             q_error("redis GET on [%s] failed. invalid reply type", key.c_str());
         }
         freeReplyObject(reply);
-        return size;
+        return result;
     }
 
     JobOption RedisQ::peek(const string& queue_name)
@@ -174,7 +179,7 @@ namespace Q
         if (!this->active) return JobOption();
         
         JobOption job;
-        string key = build_queue_key(queue_name);
+        string key = build_queue_key(this->config.prefix, queue_name);
         redisReply* reply = runRedisCommand("LRANGE %s 0 0", key.c_str());
         if (NULL == reply) return JobOption();
         if (REDIS_REPLY_STRING == reply->type)
@@ -194,7 +199,7 @@ namespace Q
     {
         if (!this->active) return JobOption();
         
-        string key = build_queue_key(queue_name);
+        string key = build_queue_key(this->config.prefix, queue_name);
         redisReply* reply1 = runRedisCommand("LPOP %s", key.c_str());
         if (NULL == reply1) return JobOption();
         if (REDIS_REPLY_NIL == reply1->type)
@@ -209,7 +214,7 @@ namespace Q
             return JobOption();
         }
             
-        string queue_size_key = build_queue_size_key(queue_name);
+        string queue_size_key = build_queue_size_key(this->config.prefix, queue_name);
         redisReply* reply2 = runRedisCommand("DECR %s", queue_size_key.c_str());
         if (NULL == reply2) return JobOption();
         if (REDIS_REPLY_INTEGER != reply2->type)
@@ -229,7 +234,7 @@ namespace Q
     {
         if (!this->active) return;
         
-        string job_key = build_job_key(job.uid());
+        string job_key = build_job_key(this->config.prefix, job.uid());
         string job_json = JobCodec::encode(job);
         redisReply* reply1 = runRedisCommand("SET %s %s", job_key.c_str(), job_json.c_str());
         if (NULL == reply1) return;    
@@ -239,7 +244,7 @@ namespace Q
             return freeReplyObject(reply1);
         }
         
-        string queue_key = build_queue_key(queue_name);
+        string queue_key = build_queue_key(this->config.prefix, queue_name);
         redisReply* reply2 = runRedisCommand("RPUSH %s %s", queue_key.c_str(), job.uid().c_str());
         if (NULL == reply2) return;
         if (REDIS_REPLY_INTEGER != reply2->type)
@@ -248,7 +253,7 @@ namespace Q
             return freeReplyObject(reply2);
         }
         
-        string queue_size_key = build_queue_size_key(queue_name);
+        string queue_size_key = build_queue_size_key(this->config.prefix, queue_name);
         redisReply* reply3 = runRedisCommand("INCR %s", queue_size_key.c_str());
         if (NULL == reply3) return;    
         if (REDIS_REPLY_INTEGER != reply3->type)
@@ -266,7 +271,7 @@ namespace Q
         if (!this->active) return JobOption();
         
         JobOption job;
-        string key = build_job_key(uid);
+        string key = build_job_key(this->config.prefix, uid);
         redisReply* reply = runRedisCommand("GET %s", key.c_str());
         if (NULL == reply) return JobOption();
         if (REDIS_REPLY_STRING == reply->type)
@@ -292,7 +297,7 @@ namespace Q
         JobOption job = find_job(uid);
         if (job.empty()) return JobOption();
         Job updated_job = job.get().withStatus(status, status_description);
-        string key = build_job_key(updated_job.uid());
+        string key = build_job_key(this->config.prefix, updated_job.uid());
         string job_json = JobCodec::encode(updated_job);
         redisReply* reply = runRedisCommand("SET %s %s", key.c_str(), job_json.c_str());
         if (NULL == reply) return JobOption();
@@ -311,7 +316,7 @@ namespace Q
         JobOption job = find_job(uid);
         if (job.empty()) return JobOption();
         Job updated_job = job.get().withRunAt(run_at);
-        string key = build_job_key(updated_job.uid());
+        string key = build_job_key(this->config.prefix, updated_job.uid());
         string job_json = JobCodec::encode(updated_job);
         redisReply* reply = runRedisCommand("SET %s %s", key.c_str(), job_json.c_str());
         if (NULL == reply) return JobOption();
@@ -327,7 +332,7 @@ namespace Q
     {
         if (!this->active) return;
         
-        string job_key = build_job_key(uid);
+        string job_key = build_job_key(this->config.prefix, uid);
         redisReply* reply1 = runRedisCommand("DEL %s", job_key.c_str());
         if (NULL == reply1) return;
         if (REDIS_REPLY_INTEGER != reply1->type)
@@ -339,7 +344,7 @@ namespace Q
         for (vector<string>::iterator queue_it = all_queues.begin(); queue_it != all_queues.end(); queue_it++)
         {
             string queue_name = *queue_it;        
-            string queue_key = build_queue_key(queue_name);
+            string queue_key = build_queue_key(this->config.prefix, queue_name);
             redisReply* reply2 = runRedisCommand("LREM %s 0 %s", queue_key.c_str(), uid.c_str());
             if (NULL == reply2) break;
             if (REDIS_REPLY_INTEGER != reply2->type)
@@ -347,7 +352,7 @@ namespace Q
                 q_error("redis LREM on [%s] failed. invalid reply type", queue_key.c_str());
             }
             
-            string queue_size_key = build_queue_size_key(queue_name);
+            string queue_size_key = build_queue_size_key(this->config.prefix, queue_name);
             redisReply* reply3 = runRedisCommand("DECR %s", queue_size_key.c_str());
             if (NULL == reply3) break;
             if (REDIS_REPLY_INTEGER != reply3->type)
@@ -379,19 +384,19 @@ namespace Q
         return reply;
     }
 
-    string RedisQ::build_queue_key(const string& queue_name)
+    string build_queue_key(const string& prefix, const string& queue_name)
     {
-        return build_key("%s:q:%s", this->config.prefix.c_str(), queue_name.c_str());
+        return build_key("%s:q:%s", prefix.c_str(), queue_name.c_str());
     }
 
-    string RedisQ::build_queue_size_key(const string& queue_name)
+    string build_queue_size_key(const string& prefix, const string& queue_name)
     {
-        return build_key("%s:q:%s:s", this->config.prefix.c_str(),queue_name.c_str());
+        return build_key("%s:q:%s:s", prefix.c_str(),queue_name.c_str());
     }
 
-    string RedisQ::build_job_key(const string& job_uid)
+    string build_job_key(const string& prefix, const string& job_uid)
     {
-        return build_key("%s:j:%s", this->config.prefix.c_str(), job_uid.c_str());
+        return build_key("%s:j:%s", prefix.c_str(), job_uid.c_str());
     }
 
     string build_key(const char* format, ...)
