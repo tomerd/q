@@ -119,17 +119,17 @@ int main(int argc, const char * argv[])
     clear(pq);
     test1(pq);
     
-    //clear(pq);
-    //test2(pq);
+    clear(pq);
+    test2(pq);
     
-    //clear(pq);
-    //test3(pq, 100000, 30);
+    clear(pq);
+    test3(pq, 100000, 30);
     
-    //clear(pq);
-    //test4(pq, 50000);
+    clear(pq);
+    test4(pq, 50000);
     
-    //clear(pq);
-    //test5(pq);
+    clear(pq);
+    test5(pq);
     
     //clear(pq);
     //test6(pq);
@@ -160,7 +160,7 @@ void test1(void* q)
     q_post(q, "channel1", NULL, "test 9");
     q_post(q, "channel1", NULL, "test 10");
     
-    sleep(2000);
+    sleep(2);
     receiver::assert_recieved("test 1");
     receiver::assert_recieved("test 2");
     receiver::assert_recieved("test 3");

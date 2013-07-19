@@ -173,9 +173,16 @@ namespace Q
                 vector<string>::iterator head = queue.begin();
                 job_uid = *head;
                 queue.erase(head);
-                const string result = encode_queue(queue);
-                *sp = result.size();
-                return result.c_str();
+                const string updated_queue = encode_queue(queue);
+                
+                char* result = new char[updated_queue.size()];
+                updated_queue.copy(result, updated_queue.size());                
+                *sp = updated_queue.size();
+                return result;
+                
+                //const string result = encode_queue(queue);
+                //*sp = result.size();
+                //return result.c_str()
             }
             
             const char* visit_empty(const char* kbuf, size_t ksiz, size_t *sp)
@@ -198,9 +205,15 @@ namespace Q
                 }
                 std::stringstream stream;
                 stream << (count-1);
-                const string result = stream.str();
-                *sp = result.size();
-                return result.c_str();
+                const string string_count = stream.str();
+                
+                char* result = new char[string_count.size()];
+                string_count.copy(result, string_count.size());
+                *sp = string_count.size();
+                return result;
+                
+                //*sp = result.size();
+                //return result.c_str();
             }
             
             const char* visit_empty(const char* kbuf, size_t ksiz, size_t *sp)
@@ -212,7 +225,7 @@ namespace Q
                 
         JobOption result = JobOption();
         
-        //db.begin_transaction();
+        db.begin_transaction();
         
         try
         {
@@ -232,7 +245,7 @@ namespace Q
             q_error("pop_front() failed. %s", e.what());
         }
         
-        //db.end_transaction();
+        db.end_transaction();
         
         return result;
     }
@@ -251,21 +264,40 @@ namespace Q
         protected:
             const char* visit_full(const char* kbuf, size_t ksiz, const char* vbuf, size_t vsiz, size_t *sp)
             {
-                string raw_queue;
-                if (vsiz > 0)
+                if (0 == vsiz)
                 {
-                    raw_queue.append(vbuf, 0, vsiz);
-                    raw_queue.append(" ");
+                    //*sp = job_uid.size();
+                    //return job_uid.c_str();
+                    
+                    char* result = new char[job_uid.size()];
+                    job_uid.copy(result, job_uid.size());
+                    *sp = job_uid.size();
+                    return result;
                 }
-                raw_queue.append(job_uid);
-                *sp = raw_queue.size();
-                return raw_queue.c_str();
+                                
+                unsigned long size = vsiz + job_uid.size() + 1;
+                char* result = new char[size];
+                strncpy(result, vbuf, vsiz);
+                strcpy(result + vsiz, " ");
+                strcpy(result + vsiz + 1, job_uid.c_str());
+                result[size] = '\0';
+                *sp = size;
+                return result;
+                
+                //const string result = value + " " + job_uid;
+                //*sp = result.size();
+                //return result.c_str();
             }
             
             const char* visit_empty(const char* kbuf, size_t ksiz, size_t *sp)
             {
+                //*sp = job_uid.size();
+                //return job_uid.c_str();
+                
+                char* result = new char[job_uid.size()];
+                job_uid.copy(result, job_uid.size());
                 *sp = job_uid.size();
-                return job_uid.c_str();
+                return result;
             }
             
         private:
@@ -287,9 +319,14 @@ namespace Q
                 }
                 std::stringstream stream;
                 stream << (count+1);
-                const string result = stream.str();
-                *sp = result.size();
-                return result.c_str();
+                const string string_count = stream.str();
+                //*sp = result.size();
+                //return result.c_str();
+                
+                char* result = new char[string_count.size()];
+                string_count.copy(result, string_count.size());
+                *sp = string_count.size();
+                return result;
             }
             
             const char* visit_empty(const char* kbuf, size_t ksiz, size_t *sp)
@@ -300,7 +337,7 @@ namespace Q
         } inc_visitor;
         
         
-        //db.begin_transaction();
+        db.begin_transaction();
         
         try
         {
@@ -318,7 +355,7 @@ namespace Q
             q_error("push_back() failed. %s", e.what());
         }
 
-        //db.end_transaction();
+        db.end_transaction();
     }
     
     JobOption KyotoCabinetQ::find_job(const string& uid)
@@ -369,9 +406,15 @@ namespace Q
                 JobOption job = JobCodec::decode(value);
                 if (job.empty()) return NOP;
                 updated_job = JobOption(job.get().withStatus(status, status_description));
-                const string result = JobCodec::encode(updated_job.get());
-                *sp = result.size();
-                return result.c_str();
+                const string updated_job_string = JobCodec::encode(updated_job.get());
+                
+                char* result = new char[updated_job_string.size()];
+                updated_job_string.copy(result, updated_job_string.size());
+                *sp = updated_job_string.size();
+                return result;
+                
+                //*sp = result.size();
+                //return result.c_str();
             }
             
             const char* visit_empty(const char* kbuf, size_t ksiz, size_t *sp)
@@ -420,9 +463,15 @@ namespace Q
                 JobOption job = JobCodec::decode(value);
                 if (job.empty()) return NOP;
                 updated_job = JobOption(job.get().withRunAt(run_at));
-                const string result = JobCodec::encode(updated_job.get());
-                *sp = result.size();
-                return result.c_str();
+                const string updated_job_string = JobCodec::encode(updated_job.get());
+                
+                char* result = new char[updated_job_string.size()];
+                updated_job_string.copy(result, updated_job_string.size());
+                *sp = updated_job_string.size();
+                return result;
+                
+                //*sp = result.size();
+                //return result.c_str();
             }
             
             const char* visit_empty(const char* kbuf, size_t ksiz, size_t *sp)

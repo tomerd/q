@@ -86,7 +86,7 @@ namespace Q
         if (driver.empty()) return QTUndefined;
         if (iequals(driver, "transient")) return QTTransient;
         if (iequals(driver, "berkeley")) return QTBerkeley;
-        if (iequals(driver, "qc")) return QTKyotoCabinet;
+        if (iequals(driver, "kc")) return QTKyotoCabinet;
         if (iequals(driver, "redis")) return QTRedis;
         return QTUndefined;
     }
