@@ -98,70 +98,7 @@ namespace Q
             q_error("redis FLUSHDB failed. invalid reply type");
         }
         
-        freeReplyObject(reply);
-        
-        /*
-        // FIXME: find a better way to do this
-         
-        vector<string> keys;
-        
-        string queue_size_key = build_queue_size_key(this->config.prefix, "*");
-        redisReply* reply1 = runRedisCommand("KEYS %s", queue_size_key.c_str());
-        if (NULL == reply1) return;
-        if (REDIS_REPLY_ARRAY != reply1->type)
-        {
-            q_error("redis KEYS on [%s] failed. invalid reply type", queue_size_key.c_str());
-            freeReplyObject(reply1);
-            return;
-        }
-        for (uint index=0; index < reply1->elements; index++)
-        {
-            keys.push_back(((redisReply*)reply1->element[index])->str);
-        }
-        
-        string queue_key = build_queue_key(this->config.prefix, "*");
-        redisReply* reply2 = runRedisCommand("KEYS %s", queue_key.c_str());
-        if (NULL == reply2) return;
-        if (REDIS_REPLY_ARRAY != reply2->type)
-        {
-            q_error("redis KEYS on [%s] failed. invalid reply type", queue_key.c_str());
-            freeReplyObject(reply2);
-            return;
-        }
-        for (uint index=0; index < reply2->elements; index++)
-        {
-            keys.push_back(((redisReply*)reply2->element[index])->str);
-        }
-        
-        string job_key = build_job_key(this->config.prefix, "*");
-        redisReply* reply3 = runRedisCommand("KEYS %s", job_key.c_str());
-        if (NULL == reply3) return;
-        if (REDIS_REPLY_ARRAY != reply3->type)
-        {
-            q_error("redis KEYS on [%s] failed. invalid reply type", job_key.c_str());
-            freeReplyObject(reply3);
-            return;
-        }
-        for (uint index=0; index < reply3->elements; index++)
-        {
-            keys.push_back(((redisReply*)reply3->element[index])->str);
-        }
-        
-        for (vector<string>::iterator it = keys.begin(); it != keys.end(); it++)
-        {
-            redisReply* reply4 = runRedisCommand("DEL %s", (*it).c_str());
-            if (NULL == reply4) return;
-            if (REDIS_REPLY_INTEGER != reply4->type)
-            {
-                q_error("redis DEL on [%s] failed. invalid reply type", job_key.c_str());
-            }
-            freeReplyObject(reply4);
-        }
-        
-        freeReplyObject(reply1);
-        freeReplyObject(reply2);
-        freeReplyObject(reply3);
-        */
+        freeReplyObject(reply);        
     }
 
     #pragma mark - protected
