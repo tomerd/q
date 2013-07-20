@@ -41,6 +41,8 @@ namespace Q
     {
         if (NULL != env) return true;
         
+        MDB_txn* txn = NULL;
+        
         try
         {
             int retval = mdb_env_create(&env);
@@ -53,7 +55,6 @@ namespace Q
             retval = mdb_env_open(env, "/Users/tomer/Desktop/q.mdb", flags, 0664);
             if (0 != retval) throw QException("mdb_env_open failed " + string(mdb_strerror(retval)));
             
-            MDB_txn* txn = NULL;
             retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
             
@@ -67,12 +68,18 @@ namespace Q
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
+            mdb_close(env, db);
+            mdb_env_close(env);
             env = NULL;
             db = NULL;
             q_error("LMDBQ::connect() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
+            mdb_close(env, db);
+            mdb_env_close(env);
             env = NULL;
             db = NULL;
             q_error("LMDBQ::connect() failed. unknown error");
@@ -112,9 +119,10 @@ namespace Q
     {
         if (!this->active) return;
         
+        MDB_txn* txn = NULL;
+        
         try
-        {
-            MDB_txn* txn = NULL;
+        {            
             int retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
             
@@ -131,10 +139,12 @@ namespace Q
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::size() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::size() failed. unknown error");
         }
     }
@@ -145,11 +155,11 @@ namespace Q
     {
         if (!this->active) return -1;
         
-        unsigned long queue_size = 0;
+        MDB_txn* txn = NULL;
+        unsigned long size = 0;
         
         try
-        {
-            MDB_txn* txn = NULL;
+        {            
             int retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
             
@@ -158,7 +168,7 @@ namespace Q
             //if (0 != retval) throw QException("mdb_open failed " + string(mdb_strerror(retval)));
             
             //DbLock lock = acquire_lock(queue_name, DB_LOCK_READ);
-            queue_size = load_queue_size(txn, db, queue_name);
+            size = load_queue_size(txn, db, queue_name);
             //release_lock(&lock);
             
             //mdb_close(env, dbi);
@@ -168,25 +178,27 @@ namespace Q
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::size() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::size() failed. unknown error");
         }
         
-        return queue_size;
+        return size;
     }
     
     JobOption LMDBQ::peek(const string& queue_name)
     {
         if (!this->active) return JobOption();
         
+        MDB_txn* txn = NULL;
         JobOption result;
         
         try
-        {
-            MDB_txn* txn = NULL;
+        {            
             int retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
             
@@ -206,10 +218,12 @@ namespace Q
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::peek() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::peek() failed. unknown error");
         }
         
@@ -220,11 +234,11 @@ namespace Q
     {
         if (!active) return JobOption();
         
+        MDB_txn* txn = NULL;
         JobOption result;
         
         try
         {
-            MDB_txn* txn = NULL;
             int retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
 
@@ -255,10 +269,12 @@ namespace Q
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::peek() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::peek() failed. unknown error");
         }
         
@@ -269,9 +285,10 @@ namespace Q
     {
         if (!this->active) return;
         
+        MDB_txn* txn = NULL;
+        
         try
-        {
-            MDB_txn* txn = NULL;
+        {            
             int retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
             
@@ -309,10 +326,12 @@ namespace Q
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::push_back() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::push_back() failed. unknown error");
         }
     }
@@ -321,11 +340,11 @@ namespace Q
     {
         if (!this->active) return JobOption();
         
+        MDB_txn* txn = NULL;
         JobOption result;
         
         try
-        {
-            MDB_txn* txn = NULL;
+        {            
             int retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
             
@@ -342,10 +361,12 @@ namespace Q
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::find_job() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::find_job() failed. unknown error");
         }
         
@@ -356,11 +377,11 @@ namespace Q
     {
         if (!this->active) return JobOption();
         
+        MDB_txn* txn = NULL;
         JobOption result;
         
         try
-        {
-            MDB_txn* txn = NULL;
+        {            
             int retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
             
@@ -369,24 +390,26 @@ namespace Q
             //if (0 != retval) throw QException("mdb_open failed " + string(mdb_strerror(retval)));
             
             JobOption job = load_job_record(txn, db, uid);
-            if (job.empty()) return JobOption();
-            
-            Job updated_job = job.get().withStatus(status, status_description);
-            save_job_record(txn, db, updated_job);
+            if (!job.empty())
+            {            
+                Job updated_job = job.get().withStatus(status, status_description);
+                save_job_record(txn, db, updated_job);
+                result = JobOption(updated_job);
+            }
             
             //mdb_close(env, dbi);
             
             retval = mdb_txn_commit(txn);
             if (0 != retval) throw QException("mdb_txn_commit failed " + string(mdb_strerror(retval)));
-            
-            result = JobOption(updated_job);
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::update_job_status() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::update_job_status() failed. unknown error");
         }
         
@@ -397,11 +420,11 @@ namespace Q
     {
         if (!this->active) return JobOption();
         
+        MDB_txn* txn = NULL;
         JobOption result;
         
         try
-        {
-            MDB_txn* txn = NULL;
+        {            
             int retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
             
@@ -410,24 +433,26 @@ namespace Q
             //if (0 != retval) throw QException("mdb_open failed " + string(mdb_strerror(retval)));
             
             JobOption job = load_job_record(txn, db, uid);
-            if (job.empty()) return job;
-            
-            Job updated_job = job.get().withRunAt(run_at);
-            save_job_record(txn, db, updated_job);
+            if (!job.empty())
+            {
+                Job updated_job = job.get().withRunAt(run_at);
+                save_job_record(txn, db, updated_job);
+                result = JobOption(updated_job);
+            }
             
             //mdb_close(env, dbi);
             
             retval = mdb_txn_commit(txn);
             if (0 != retval) throw QException("mdb_txn_commit failed " + string(mdb_strerror(retval)));
-            
-            result = JobOption(updated_job);            
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::update_job_run_at() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::update_job_run_at() failed. unknown error");
         }
         
@@ -438,9 +463,10 @@ namespace Q
     {
         if (!this->active) return;
         
+        MDB_txn* txn = NULL;
+        
         try
-        {
-            MDB_txn* txn = NULL;
+        {            
             int retval = mdb_txn_begin(env, NULL, 0, &txn);
             if (0 != retval) throw QException("mdb_txn_begin failed " + string(mdb_strerror(retval)));
             
@@ -463,20 +489,23 @@ namespace Q
                     save_queue_vector(txn, db, queue_name, queue);
                     save_queue_size(txn, db, queue_name, queue.size());
                 }
-                //release_lock(&lock);
             }
             
-            mdb_close(env, db);
+            //release_lock(&lock);
+            
+            //mdb_close(env, db);
             
             retval = mdb_txn_commit(txn);
             if (0 != retval) throw QException("mdb_txn_commit failed " + string(mdb_strerror(retval)));
         }
         catch(std::exception &e)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::delete_job() failed. %s", e.what());
         }
         catch (...)
         {
+            if (NULL != txn) mdb_txn_abort(txn);
             q_error("LMDBQ::delete_job() failed. unknown error");
         }
             
