@@ -21,7 +21,9 @@ namespace Q
 {
     typedef struct LMDBConfig
     {
-        LMDBConfig()
+        string path;
+        
+        LMDBConfig(string path) : path(path)
         {}
         
     } LMDBConfig;

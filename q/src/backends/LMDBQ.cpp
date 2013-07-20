@@ -19,6 +19,8 @@
 
 namespace Q
 {
+    static LMDBConfig parse_config(const Json::Value& configuration);
+    
     static string encode_queue(const vector<string> data);
     static vector<string> decode_queue(const string& data);
     
@@ -27,10 +29,9 @@ namespace Q
     static string build_job_key(const string& job_uid);
     static string build_key(const char* format, ...);
     
-    LMDBQ::LMDBQ(const Json::Value& configuration) : Q::Q(configuration)
+    LMDBQ::LMDBQ(const Json::Value& configuration) : Q::Q(configuration), config(parse_config(configuration))
     {
         env = NULL;
-        db = NULL;
     }
     
     LMDBQ::~LMDBQ()
@@ -48,11 +49,13 @@ namespace Q
             int retval = mdb_env_create(&env);
             if (0 != retval) throw QException("mdb_env_create failed " + string(mdb_strerror(retval)));
             
-            retval = mdb_env_set_mapsize(env, 1024*1024*1024);
+            retval = mdb_env_set_mapsize(env, 1024*1048576);
             if (0 != retval) throw QException("mdb_env_set_mapsize failed " + string(mdb_strerror(retval)));
             
             int flags = MDB_NOSUBDIR;
-            retval = mdb_env_open(env, "/Users/tomer/Desktop/q.mdb", flags, 0664);
+            // FIXME...figure out path
+            string path = !config.path.empty() ? config.path : "/Users/tomer/Desktop/q.mdb";
+            retval = mdb_env_open(env, path.c_str(), flags, 0664);
             if (0 != retval) throw QException("mdb_env_open failed " + string(mdb_strerror(retval)));
             
             retval = mdb_txn_begin(env, NULL, 0, &txn);
@@ -72,7 +75,6 @@ namespace Q
             mdb_close(env, db);
             mdb_env_close(env);
             env = NULL;
-            db = NULL;
             q_error("LMDBQ::connect() failed. %s", e.what());
         }
         catch (...)
@@ -81,7 +83,6 @@ namespace Q
             mdb_close(env, db);
             mdb_env_close(env);
             env = NULL;
-            db = NULL;
             q_error("LMDBQ::connect() failed. unknown error");
         }
         
@@ -843,5 +844,11 @@ namespace Q
         key[written] = '\0';
         va_end(args);
         return key;
+    }
+    
+    LMDBConfig parse_config(const Json::Value& configuration)
+    {
+        string path = configuration.get("path", "").asString();
+        return LMDBConfig(path);
     }
 }
