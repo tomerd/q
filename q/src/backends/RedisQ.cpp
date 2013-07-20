@@ -42,8 +42,8 @@ namespace Q
         try
         {
             context = redisConnect(this->config.host.c_str(), this->config.port);
-            if (NULL == context) throw q_exception("failed creating hiredis context");
-            if (context->err) throw q_exception(context->errstr);
+            if (NULL == context) throw QException("failed creating hiredis context");
+            if (context->err) throw QException(context->errstr);
             
             start();
         }
@@ -82,11 +82,27 @@ namespace Q
         }
     }
 
-    // FIXME: find a better way to do this
-    void RedisQ::flush()
+    // FIXME: implement this
+    void RedisQ::clear(const string& queue)
+    {
+    }
+    
+    void RedisQ::drop()
     {
         if (!this->active) return;
+     
+        redisReply* reply = runRedisCommand("FLUSHDB");
+        if (NULL == reply) return;
+        if (REDIS_REPLY_STATUS != reply->type)
+        {
+            q_error("redis FLUSHDB failed. invalid reply type");
+        }
         
+        freeReplyObject(reply);
+        
+        /*
+        // FIXME: find a better way to do this
+         
         vector<string> keys;
         
         string queue_size_key = build_queue_size_key(this->config.prefix, "*");
@@ -144,7 +160,8 @@ namespace Q
         
         freeReplyObject(reply1);
         freeReplyObject(reply2);
-        freeReplyObject(reply3);    
+        freeReplyObject(reply3);
+        */
     }
 
     #pragma mark - protected

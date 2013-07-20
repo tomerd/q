@@ -1,43 +1,39 @@
 //
-//  RedisQ.h
+//  KyotoCabinetQ.h
 //  q
 //
-//  Created by Tomer Doron on 4/30/13.
+//  Created by Tomer Doron on 7/17/13.
 //  Copyright (c) 2013 Tomer Doron. All rights reserved.
 //
 
-#ifndef __q__RedisQ__
-#define __q__RedisQ__
+#ifndef __q__KyotoCabinetQ__
+#define __q__KyotoCabinetQ__
 
 #include <iostream>
-#include <mutex>
 
 #include "../core/Q.h"
 // FIXME: use better linking & header inclusion stratgey
-#include "../3rd-party/hiredis/hiredis.h"
+#include "../3rd-party/kyotocabinet/kcpolydb.h"
 
 using namespace std;
+using namespace kyotocabinet;
 
 namespace Q
 {
-    typedef struct RedisConfig
-    {
-        string host;
-        int port;
-        string prefix;
-        
-        RedisConfig(string host, int port, string prefix) : host(host), port(port), prefix(prefix)
+    typedef struct KyotoCabinetConfig
+    {        
+        KyotoCabinetConfig()
         {}
         
-    } RedisConfig;
-
-    class RedisQ : public Q
+    } KyotoCabinetConfig;
+    
+    class KyotoCabinetQ : public Q
     {
         
     public:
         
-        RedisQ(const Json::Value& configuration);
-        ~RedisQ();
+        KyotoCabinetQ(const Json::Value& configuration);
+        ~KyotoCabinetQ();
         
         bool connect();
         void disconnect();
@@ -56,15 +52,11 @@ namespace Q
         void delete_job(const string& uid);
         
     private:
-        
-        static mutex* redis_mutex;
-        
-        RedisConfig config;
-        redisContext* context;
-        
-        redisReply* runRedisCommand(const char* command, ...);    
-        //void handle_reply_error();
+                
+        KyotoCabinetConfig config;
+        PolyDB db;
+                
     };
 }
 
-#endif /* defined(__q__RedisQ__) */
+#endif /* defined(__q__KyotoCabinetQ__) */

@@ -101,8 +101,18 @@ void q_observer(void* pq, const char* queue, void (*delegate)(const char**))
 }
 
 EXPORT
-void q_flush(void* pq)
+void q_clear(void* pq, const char* queue)
 {
     if (NULL == pq) return;
-    ((Q::Q*)pq)->flush();
+    if (NULL == queue) return;
+    
+    ((Q::Q*)pq)->clear(queue);
 }
+
+EXPORT
+void q_drop(void* pq)
+{
+    if (NULL == pq) return;
+    ((Q::Q*)pq)->drop();
+}
+

@@ -27,7 +27,10 @@ extern "C"
 
     void q_observer(void* q, const char* queue, void (*delegate)(const char**));
 
-    void q_flush(void* q);
+    void q_clear(void* q, const char* queue);
+    
+    void q_drop(void* q);
+
 }
 
 #endif /* defined(__q__Qlib__) */

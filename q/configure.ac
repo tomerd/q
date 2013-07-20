@@ -58,20 +58,20 @@ else
 	AM_CONDITIONAL(Q_JNI, false)
 fi
 
-dnl If --with-berkeley, make with berkeley db support
-AC_ARG_WITH(berkeley,
-    [ --with-berkeley 	  - make with berkeley db support (default=no) ],
-    [with_berkeley=true])
-
-dnl check for berkeley support
-if test "$with_berkeley" = "true"; then
-	AX_BERKELEY_DB_CXX
-fi	
-if test "$DB_CXX_HEADER" = ""; then
-	AM_CONDITIONAL(Q_BERKELEY, false)
-else
-	AM_CONDITIONAL(Q_BERKELEY, true)
-fi
+#dnl If --with-berkeley, make with berkeley db support
+#AC_ARG_WITH(berkeley,
+#    [ --with-berkeley 	  - make with berkeley db support (default=no) ],
+#    [with_berkeley=true])
+#
+#dnl check for berkeley support
+#if test "$with_berkeley" = "true"; then
+#	AX_BERKELEY_DB_CXX
+#fi	
+#if test "$DB_CXX_HEADER" = ""; then
+#	AM_CONDITIONAL(Q_BERKELEY, false)
+#else
+#	AM_CONDITIONAL(Q_BERKELEY, true)
+#fi
 
 LT_INIT
 
@@ -79,6 +79,8 @@ AC_SUBST([Q_API_VERSION], [1.0])
 AC_SUBST([Q_SO_VERSION], [1:0:0])
 
 AC_CONFIG_FILES([Makefile
-				 src/Makefile
+				 src/core/Makefile
+				 src/backends/Makefile
+				 src/3rd-party/json/Makefile
                  q-${Q_API_VERSION}.pc:q.pc.in])
 AC_OUTPUT

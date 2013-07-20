@@ -75,13 +75,21 @@ extern "C"
      */
     JNIEXPORT void JNICALL Java_com_mishlabs_q_Q_native_1observer
     (JNIEnv *, jobject, jlong, jstring, jobject);
+
+    /*
+     * Class:     com_mishlabs_q_Q
+     * Method:    native_clear
+     * Signature: (JLjava/lang/String;)Z
+     */
+    JNIEXPORT void JNICALL Java_com_mishlabs_q_Q_native_1clear
+    (JNIEnv *, jobject, jlong, jstring);
     
     /*
      * Class:     com_mishlabs_q_Q
-     * Method:    native_flush
+     * Method:    native_drop
      * Signature: (J)V
      */
-    JNIEXPORT void JNICALL Java_com_mishlabs_q_Q_native_1flush
+    JNIEXPORT void JNICALL Java_com_mishlabs_q_Q_native_1drop
     (JNIEnv *, jobject, jlong);
 
 }

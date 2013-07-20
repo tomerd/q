@@ -96,7 +96,7 @@ vector<string> receiver::observed_beffer = vector<string>();
 
 void clear(void* pq)
 {
-    q_flush(pq);
+    q_drop(pq);
     receiver::recieved_buffer.clear();
     receiver::observed_beffer.clear();        
 }
@@ -108,28 +108,29 @@ int main(int argc, const char * argv[])
     string transient = "";
     string berkeley = "{ \"driver\": \"berkeley\" }";
     string qc = "{ \"driver\": \"qc\" }";
+    string lmdb = "{ \"driver\": \"lmdb\" }";
     string redis = "{ \"driver\": \"redis\", \"host\": \"127.0.0.1\" }";
     
     void* pq = NULL;
-    q_connect(&pq, qc.c_str());
+    q_connect(&pq, lmdb.c_str());
     if (NULL == pq) return 1;
     
     
     /***************/
-    clear(pq);
-    test1(pq);
+    //clear(pq);
+    //test1(pq);
     
-    clear(pq);
-    test2(pq);
+    //clear(pq);
+    //test2(pq);
     
     clear(pq);
     test3(pq, 100000, 30);
     
-    clear(pq);
-    test4(pq, 50000);
+    //clear(pq);
+    //test4(pq, 50000);
     
-    clear(pq);
-    test5(pq);
+    //clear(pq);
+    //test5(pq);
     
     //clear(pq);
     //test6(pq);
@@ -150,7 +151,7 @@ void test1(void* q)
     q_worker(q, "channel1", &receiver::worker1);
     
     q_post(q, "channel1", NULL, "test 1");
-    q_post(q, "channel1", NULL, "test 2");
+    q_post(q, "channel1", NULL, "test 2");    
     q_post(q, "channel1", NULL, "test 3");
     q_post(q, "channel1", NULL, "test 4");
     q_post(q, "channel1", NULL, "test 5");
@@ -159,7 +160,6 @@ void test1(void* q)
     q_post(q, "channel1", NULL, "test 8");
     q_post(q, "channel1", NULL, "test 9");
     q_post(q, "channel1", NULL, "test 10");
-    
     sleep(2);
     receiver::assert_recieved("test 1");
     receiver::assert_recieved("test 2");

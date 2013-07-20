@@ -169,10 +169,20 @@ void Java_com_mishlabs_q_Q_native_1observer(JNIEnv* env, jobject obj, jlong qp, 
 }
 
 JNIEXPORT JNICALL
-void Java_com_mishlabs_q_Q_native_1flush(JNIEnv* env, jobject obj, jlong qp)
+void Java_com_mishlabs_q_Q_native_1clear(JNIEnv* env, jobject obj, jlong qp, jstring jqueue)
 {
     if (0 == qp) return;
-    ((Q::Q*)qp)->flush();
+    if (NULL == jqueue) return false;
+    const char* queue = env->GetStringUTFChars(jqueue, NULL);
+    ((Q::Q*)qp)->clear(queue);
+    env->ReleaseStringUTFChars(jqueue, queue);
+}
+
+JNIEXPORT JNICALL
+void Java_com_mishlabs_q_Q_native_1drop(JNIEnv* env, jobject obj, jlong qp)
+{
+    if (0 == qp) return;
+    ((Q::Q*)qp)->drop();
 }
 
 void check_for_java_error(JNIEnv* env, Q::JobError** error)

@@ -17,9 +17,9 @@
 
 namespace Q
 {
-    struct not_found_exception : public exception
+    struct NotFoundException : public exception
     {
-        not_found_exception() {}
+        NotFoundException() {}
     };
     
     static KyotoCabinetConfig parse_config(const Json::Value& configuration);
@@ -31,9 +31,7 @@ namespace Q
     static string build_queue_size_key(const string& queue_name);
     static string build_job_key(const string& job_uid);
     static string build_key(const char* format, ...);
-    
-    //mutex* KyotoCabinetQ::kc_mutex = new mutex();
-    
+        
     KyotoCabinetQ::KyotoCabinetQ(const Json::Value& configuration) : Q::Q(configuration), config(parse_config(configuration))
     {
     }
@@ -49,7 +47,7 @@ namespace Q
         try
         {
             string db_name = "/Users/tomer/q.kch";
-            if (!db.open(db_name, PolyDB::OWRITER | PolyDB::OCREATE)) throw q_exception(db.error().message());
+            if (!db.open(db_name, PolyDB::OWRITER | PolyDB::OCREATE)) throw QException(db.error().message());
             
             start();
             
@@ -73,7 +71,7 @@ namespace Q
         
         try
         {
-            if (!db.close()) throw q_exception(db.error().message());
+            if (!db.close()) throw QException(db.error().message());
         }
         catch (exception& e)
         {
@@ -104,17 +102,17 @@ namespace Q
             string key = build_queue_size_key(queue_name);
             if (!db.get(key, &value))
             {
-                if (BasicDB::Error::Code::NOREC == db.error().code()) throw not_found_exception();
-                throw q_exception("kyoto cabinet GET failed on [" + key + "] " + db.error().message());
+                if (BasicDB::Error::Code::NOREC == db.error().code()) throw NotFoundException();
+                throw QException("kyoto cabinet GET failed on [" + key + "] " + db.error().message());
             }
             
             char* end;
             unsigned long size = 0;
             size = strtol(value.c_str(), &end, 10);
-            if (end == value.c_str() || *end != '\0' || errno == ERANGE) throw q_exception("queue counter [" + key + "] returned invalid value (" + value + ")");
+            if (end == value.c_str() || *end != '\0' || errno == ERANGE) throw QException("queue counter [" + key + "] returned invalid value (" + value + ")");
             return size;
         }
-        catch (not_found_exception& e)
+        catch (NotFoundException& e)
         {
             // ignore
         }
@@ -136,13 +134,13 @@ namespace Q
             string key = build_queue_key(queue_name);
             if (!db.get(key, &value))
             {
-                if (BasicDB::Error::Code::NOREC == db.error().code()) throw not_found_exception();
-                throw q_exception("kyoto cabinet GET failed on [" + key + "] " + db.error().message());
+                if (BasicDB::Error::Code::NOREC == db.error().code()) throw NotFoundException();
+                throw QException("kyoto cabinet GET failed on [" + key + "] " + db.error().message());
             }
             vector<string> queue = decode_queue(value);
             if (!queue.empty()) return find_job(*queue.begin());
         }
-        catch (not_found_exception& e)
+        catch (NotFoundException& e)
         {
             // ignore
         }
@@ -230,12 +228,12 @@ namespace Q
         try
         {
             string queue_key = build_queue_key(queue_name);
-            if (!db.accept(queue_key.c_str(), queue_key.size(), &pop_visitor, true)) throw q_exception("kyoto cabinet ACCEPT failed on [" + queue_key + "] " + db.error().message());
+            if (!db.accept(queue_key.c_str(), queue_key.size(), &pop_visitor, true)) throw QException("kyoto cabinet ACCEPT failed on [" + queue_key + "] " + db.error().message());
             
             if (!pop_visitor.job_uid.empty())
             {
                 string queue_size_key = build_queue_size_key(queue_name);
-                if (!db.accept(queue_size_key.c_str(), queue_size_key.size(), &dec_visitor, true)) throw q_exception("kyoto cabinet ACCEPT failed on [" + queue_size_key + "] " + db.error().message());
+                if (!db.accept(queue_size_key.c_str(), queue_size_key.size(), &dec_visitor, true)) throw QException("kyoto cabinet ACCEPT failed on [" + queue_size_key + "] " + db.error().message());
                 
                 result = find_job(pop_visitor.job_uid);
             }
@@ -342,13 +340,13 @@ namespace Q
         try
         {
             string job_key = build_job_key(job.uid());
-            if (!db.set(job_key, JobCodec::encode(job))) throw q_exception("kyoto cabinet SET failed on [" + job_key + "] " + db.error().message());
+            if (!db.set(job_key, JobCodec::encode(job))) throw QException("kyoto cabinet SET failed on [" + job_key + "] " + db.error().message());
             
             string queue_key = build_queue_key(queue_name);
-            if (!db.accept(queue_key.c_str(), queue_key.size(), &push_visitor, true)) throw q_exception("kyoto cabinet ACCEPT failed on [" + queue_key + "] " + db.error().message());
+            if (!db.accept(queue_key.c_str(), queue_key.size(), &push_visitor, true)) throw QException("kyoto cabinet ACCEPT failed on [" + queue_key + "] " + db.error().message());
             
             string queue_size_key = build_queue_size_key(queue_name);
-            if (!db.accept(queue_size_key.c_str(), queue_size_key.size(), &inc_visitor, true)) throw q_exception("kyoto cabinet ACCEPT failed on [" + queue_size_key + "] " + db.error().message());
+            if (!db.accept(queue_size_key.c_str(), queue_size_key.size(), &inc_visitor, true)) throw QException("kyoto cabinet ACCEPT failed on [" + queue_size_key + "] " + db.error().message());
         }
         catch (exception e)
         {
@@ -368,12 +366,12 @@ namespace Q
             string key = build_job_key(uid);
             if (!db.get(key, &value))
             {
-                if (BasicDB::Error::Code::NOREC == db.error().code()) throw not_found_exception();
-                throw q_exception("kyoto cabinet GET failed on [" + key + "] " + db.error().message());
+                if (BasicDB::Error::Code::NOREC == db.error().code()) throw NotFoundException();
+                throw QException("kyoto cabinet GET failed on [" + key + "] " + db.error().message());
             }
             return JobCodec::decode(value);
         }
-        catch (not_found_exception& e)
+        catch (NotFoundException& e)
         {
             // ignore
         }
@@ -431,7 +429,7 @@ namespace Q
         try
         {
             string key = build_job_key(uid);
-            if (!db.accept(key.c_str(), key.size(), &visitor, true)) throw q_exception("kyoto cabinet ACCEPT failed on [" + key + "] " + db.error().message());
+            if (!db.accept(key.c_str(), key.size(), &visitor, true)) throw QException("kyoto cabinet ACCEPT failed on [" + key + "] " + db.error().message());
             return visitor.updated_job;
         }
         catch (exception& e)
@@ -487,7 +485,7 @@ namespace Q
         try
         {
             string key = build_job_key(uid);
-            if (!db.accept(key.c_str(), key.size(), &visitor, true)) throw q_exception("kyoto cabinet ACCEPT failed on [" + key + "] " + db.error().message());
+            if (!db.accept(key.c_str(), key.size(), &visitor, true)) throw QException("kyoto cabinet ACCEPT failed on [" + key + "] " + db.error().message());
             return visitor.updated_job;
         }
         catch (exception& e)
@@ -506,7 +504,7 @@ namespace Q
         {
             string value;
             string key = build_job_key(uid);
-            if (!db.remove(key)) throw q_exception("kyoto cabinet REMOVE failed on [" + key + "] " + db.error().message());
+            if (!db.remove(key)) throw QException("kyoto cabinet REMOVE failed on [" + key + "] " + db.error().message());
         }
         catch (exception& e)
         {

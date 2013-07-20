@@ -50,7 +50,9 @@ namespace Q
         
         virtual bool connect();
         virtual void disconnect();
-        virtual void flush() = 0;
+        
+        virtual void clear(const string& queue) = 0;
+        virtual void drop() = 0;
         
         const string post(const string& queue, const string& uid, const string& data, const long run_at);
         bool reschedule(const string& uid, const long run_at);
@@ -98,10 +100,10 @@ namespace Q
         //JobOption handle_job_result(const string& queue, const Job& job, const JobError* error);    
     };
 
-    struct q_exception : public exception
+    struct QException : public exception
     {
         string _description;
-        q_exception(string description) : _description(description) {}
+        QException(string description) : _description(description) {}
         const char* what() const throw() { return _description.c_str(); }
     };
     
