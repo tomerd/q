@@ -14,23 +14,25 @@
 #include "../3rd-party/json/json.h"
 #include "Logger.h"
 
-#include "../transient/TransientQ.h"
+//#include "../backends/TransientQ.h"
+//#include "../backends/BerkeleyQ.h"
+//#ifdef DB_CXX_HEADER
+//    #include "../backends/BerkeleyQ.h"
+//#endif
+//#include "../backends/KyotoCabinetQ.h"
 
-#include "../kyotocabinet/KyotoCabinetQ.h"
-#include "../redis/RedisQ.h"
-
-#ifdef DB_CXX_HEADER
-    #include "../berkeley/BerkeleyQ.h"
-#endif
+#include "../backends/lmdbQ.h"
+#include "../backends/RedisQ.h"
 
 namespace Q
 {    
     typedef enum QType
     {
         QTUndefined,
-        QTTransient,
-        QTBerkeley,
-        QTKyotoCabinet,
+        //QTTransient,
+        //QTBerkeley,
+        //QTKyotoCabinet,
+        QTLMDB,
         QTRedis
     } QType;
 
@@ -49,22 +51,25 @@ namespace Q
             switch (q_type)
             {
                 case QTUndefined:
-                case QTTransient:
-                    *qp = new TransientQ(configuration);
-                    break;
-#ifdef DB_CXX_HEADER
-                case QTBerkeley:
-                    *qp = new BerkeleyQ(json_config);
-                    break;
-#endif
-                case QTKyotoCabinet:
-                    *qp = new KyotoCabinetQ(json_config);
+                //case QTTransient:
+                //    *qp = new TransientQ(configuration);
+                //    break;
+//#ifdef DB_CXX_HEADER
+//                case QTBerkeley:
+//                    *qp = new BerkeleyQ(json_config);
+//                    break;
+//#endif
+//                case QTKyotoCabinet:
+//                    *qp = new KyotoCabinetQ(json_config);
+//                    break;
+                case QTLMDB:
+                    *qp = new LMDBQ(json_config);
                     break;
                 case QTRedis:
                     *qp = new RedisQ(json_config);
                     break;
                 default:
-                    throw q_exception("unknown driver");
+                    throw QException("unknown driver");
                     break;
             }
         }
@@ -84,9 +89,10 @@ namespace Q
     QType parse_driver(const string& driver)
     {
         if (driver.empty()) return QTUndefined;
-        if (iequals(driver, "transient")) return QTTransient;
-        if (iequals(driver, "berkeley")) return QTBerkeley;
-        if (iequals(driver, "kc")) return QTKyotoCabinet;
+        //if (iequals(driver, "transient")) return QTTransient;
+        //if (iequals(driver, "berkeley")) return QTBerkeley;
+        //if (iequals(driver, "kc")) return QTKyotoCabinet;
+        if (iequals(driver, "lmdb")) return QTLMDB;
         if (iequals(driver, "redis")) return QTRedis;
         return QTUndefined;
     }
@@ -96,7 +102,7 @@ namespace Q
         Json::Value root;
         Json::Reader reader;
         bool result = reader.parse(configuration, root);
-        if (!result) throw q_exception(string("failed parsing configuration json. ").append(reader.getFormatedErrorMessages()));
+        if (!result) throw QException("failed parsing configuration json. " + reader.getFormatedErrorMessages());
         return root;
     }
 

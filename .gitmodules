@@ -1,3 +1,6 @@
 [submodule "q/src/3rd-party/hiredis"]
 	path = q/src/3rd-party/hiredis
 	url = git://github.com/redis/hiredis.git
+[submodule "q/src/3rd-party/mdb"]
+	path = q/src/3rd-party/mdb
+	url = git://gitorious.org/mdb/mdb.git
