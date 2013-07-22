@@ -21,6 +21,7 @@ q runs on multiple back-ends and has bindings to many programing languages. and 
   [102]: http://redis.io/             "redis"
 
 ##### languages support
+* C/C++ (native lib API)
 * [ruby] [201]
 * [node.js] [202]
 * [java/scala] [203]
