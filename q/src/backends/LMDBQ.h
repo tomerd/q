@@ -21,9 +21,10 @@ namespace Q
 {
     typedef struct LMDBConfig
     {
+        bool transient;
         string path;
         
-        LMDBConfig(string path) : path(path)
+        LMDBConfig(bool transient, string path) : transient(transient), path(path)
         {}
         
     } LMDBConfig;
@@ -58,24 +59,7 @@ namespace Q
                 
         LMDBConfig config;
         MDB_env* env;
-        MDB_dbi db;
-        
-        unsigned long load_queue_size(MDB_txn* txn, MDB_dbi dbi, const string& queue_name);
-        void save_queue_size(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, unsigned long size);
-        
-        string load_queue_raw(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, size_t size_hint);
-        void save_queue_raw(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, const string& data);
-        
-        vector<string> load_queue_vector(MDB_txn* txn, MDB_dbi dbi, const string& queue_name);
-        void save_queue_vector(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, const vector<string> data);
-        
-        JobOption load_job_record(MDB_txn* txn, MDB_dbi dbi, const string& uid);
-        void save_job_record(MDB_txn* txn, MDB_dbi dbi, const Job& job);
-        void delete_job_record(MDB_txn* txn, MDB_dbi dbi, const string& uid);
-        
-        string load_string_record(MDB_txn* txn, MDB_dbi dbi, const string& key, size_t size_hint=0);
-        void save_string_record(MDB_txn* txn,MDB_dbi dbi,  const string& key, const string& value, const uint flags);
-        void delete_record(MDB_txn* txn, MDB_dbi dbi, const string& key);
+        MDB_dbi db;    
     };
 }
 

@@ -29,6 +29,24 @@ namespace Q
     static string build_job_key(const string& job_uid);
     static string build_key(const char* format, ...);
     
+    
+    static unsigned long load_queue_size(MDB_txn* txn, MDB_dbi dbi, const string& queue_name);
+    static void save_queue_size(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, unsigned long size);
+    
+    static string load_queue_raw(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, size_t size_hint);
+    static void save_queue_raw(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, const string& data);
+    
+    static vector<string> load_queue_vector(MDB_txn* txn, MDB_dbi dbi, const string& queue_name);
+    static void save_queue_vector(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, const vector<string> data);
+    
+    static JobOption load_job_record(MDB_txn* txn, MDB_dbi dbi, const string& uid);
+    static void save_job_record(MDB_txn* txn, MDB_dbi dbi, const Job& job);
+    static void delete_job_record(MDB_txn* txn, MDB_dbi dbi, const string& uid);
+    
+    static string load_record(MDB_txn* txn, MDB_dbi dbi, const string& key, size_t size_hint=0);
+    static void save_record(MDB_txn* txn,MDB_dbi dbi,  const string& key, const string& value, const uint flags);
+    static void delete_record(MDB_txn* txn, MDB_dbi dbi, const string& key);
+    
     LMDBQ::LMDBQ(const Json::Value& configuration) : Q::Q(configuration), config(parse_config(configuration))
     {
         env = NULL;
@@ -53,9 +71,9 @@ namespace Q
             if (0 != retval) throw QException("mdb_env_set_mapsize failed " + string(mdb_strerror(retval)));
             
             int flags = MDB_NOSUBDIR;
-            // FIXME...figure out path
-            string path = !config.path.empty() ? config.path : "/Users/tomer/Desktop/q.mdb";
-            retval = mdb_env_open(env, path.c_str(), flags, 0664);
+            if (config.transient) flags |= MDB_NOSYNC | MDB_NOMETASYNC;
+            
+            retval = mdb_env_open(env, config.path.c_str(), flags, 0664);
             if (0 != retval) throw QException("mdb_env_open failed " + string(mdb_strerror(retval)));
             
             retval = mdb_txn_begin(env, NULL, 0, &txn);
@@ -66,6 +84,8 @@ namespace Q
             
             retval = mdb_txn_commit(txn);
             if (0 != retval) throw QException("mdb_txn_commit failed " + string(mdb_strerror(retval)));
+            
+            if (config.transient) drop();
             
             start();
         }
@@ -271,12 +291,12 @@ namespace Q
         catch(std::exception &e)
         {
             if (NULL != txn) mdb_txn_abort(txn);
-            q_error("LMDBQ::peek() failed. %s", e.what());
+            q_error("LMDBQ::pop_front() failed. %s", e.what());
         }
         catch (...)
         {
             if (NULL != txn) mdb_txn_abort(txn);
-            q_error("LMDBQ::peek() failed. unknown error");
+            q_error("LMDBQ::pop_front() failed. unknown error");
         }
         
         return result;
@@ -543,10 +563,10 @@ namespace Q
     }
     */
     
-    unsigned long LMDBQ::load_queue_size(MDB_txn* txn, MDB_dbi dbi, const string& queue_name)
+    unsigned long load_queue_size(MDB_txn* txn, MDB_dbi dbi, const string& queue_name)
     {
         string key = build_queue_size_key(queue_name);
-        const string value = load_string_record(txn, dbi, key, 7);
+        const string value = load_record(txn, dbi, key, 7);
         if (value.empty()) return 0;
         
         char* end;
@@ -599,14 +619,14 @@ namespace Q
         */
     }
     
-    void LMDBQ::save_queue_size(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, unsigned long size)
+    void save_queue_size(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, unsigned long size)
     {
         std::stringstream stream;
         stream << size;
         const string value = stream.str();
         
         string key = build_queue_size_key(queue_name);
-        save_string_record(txn, dbi, key, value, 0);
+        save_record(txn, dbi, key, value, 0);
         
         /*
         MDB_dbi dbi;
@@ -641,53 +661,53 @@ namespace Q
         */
     }
     
-    string LMDBQ::load_queue_raw(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, size_t size_hint)
+    string load_queue_raw(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, size_t size_hint)
     {
         string key = build_queue_key(queue_name);
-        return load_string_record(txn, dbi, key, size_hint);
+        return load_record(txn, dbi, key, size_hint);
     }
     
-    void LMDBQ::save_queue_raw(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, const string& data)
+    void save_queue_raw(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, const string& data)
     {
         string key = build_queue_key(queue_name);
-        save_string_record(txn, dbi, key, data, 0);
+        save_record(txn, dbi, key, data, 0);
     }
     
-    vector<string> LMDBQ::load_queue_vector(MDB_txn* txn, MDB_dbi dbi, const string& queue_name)
+    vector<string> load_queue_vector(MDB_txn* txn, MDB_dbi dbi, const string& queue_name)
     {
         string key = build_queue_key(queue_name);
-        string result = load_string_record(txn, dbi, key);
+        string result = load_record(txn, dbi, key);
         return decode_queue(result);
     }
     
-    void LMDBQ::save_queue_vector(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, vector<string> data)
+    void save_queue_vector(MDB_txn* txn, MDB_dbi dbi, const string& queue_name, vector<string> data)
     {
         string key = build_queue_key(queue_name);
         string value = encode_queue(data);
-        save_string_record(txn, dbi, key, value, 0);
+        save_record(txn, dbi, key, value, 0);
     }
     
-    JobOption LMDBQ::load_job_record(MDB_txn* txn, MDB_dbi dbi, const string& uid)
+    JobOption load_job_record(MDB_txn* txn, MDB_dbi dbi, const string& uid)
     {
         string key = build_job_key(uid);
-        string result = load_string_record(txn, dbi, key);
+        string result = load_record(txn, dbi, key);
         return result.empty() ? JobOption() : JobCodec::decode(result);
     }
     
-    void LMDBQ::save_job_record(MDB_txn* txn, MDB_dbi dbi, const Job& job)
+    void save_job_record(MDB_txn* txn, MDB_dbi dbi, const Job& job)
     {
         string key = build_job_key(job.uid());
         string value = JobCodec::encode(job);
-        save_string_record(txn, dbi, key, value, 0);
+        save_record(txn, dbi, key, value, 0);
     }
     
-    void LMDBQ::delete_job_record(MDB_txn* txn, MDB_dbi dbi, const string& uid)
+    void delete_job_record(MDB_txn* txn, MDB_dbi dbi, const string& uid)
     {
         string key = build_job_key(uid);
         delete_record(txn, dbi, key);
     }
     
-    string LMDBQ::load_string_record(MDB_txn* txn, MDB_dbi dbi, const string& key, size_t size_hint)
+    string load_record(MDB_txn* txn, MDB_dbi dbi, const string& key, size_t size_hint)
     {
         MDB_val key_accessor;
         key_accessor.mv_size = key.size();
@@ -707,45 +727,9 @@ namespace Q
         string result;
         result.assign((char*)value_accessor.mv_data, value_accessor.mv_size);
         return result;
-        
-        //string result =  string((char*)value_accessor.mv_data, 0, value_accessor.mv_size);
-        //return result;
-        
-        /*
-        Dbt key_accessor((void*)key.c_str(), (uint)key.size()+1);
-        
-        Dbt value_accessor;
-        /~
-         char value[VALUE_SIZE+1];
-         value_accessor.set_data(value);
-         value_accessor.set_ulen(VALUE_SIZE+1);
-         value_accessor.set_flags(DB_DBT_USERMEM);
-         ~/
-        value_accessor.set_flags(DB_DBT_MALLOC);
-        
-        string result;
-        switch (int ret = db->get(NULL, &key_accessor, &value_accessor, 0))
-        {
-            case 0:
-            {
-                //q_log("berkeley get: [%s] key found", key.c_str());
-                uint length = value_accessor.get_size();
-                char* value = (char*)value_accessor.get_data();
-                result.append(value, 0, length);
-                delete value;
-                break;
-            }
-            case DB_NOTFOUND:
-                q_log("berkeley get: [%s] key not found", key.c_str());
-                break;
-            default:
-                q_error("berkeley get: unknown error");
-        }
-        return result;
-        */
     }
     
-    void LMDBQ::save_string_record(MDB_txn* txn, MDB_dbi dbi, const string& key, const string& value, const uint flags)
+    void save_record(MDB_txn* txn, MDB_dbi dbi, const string& key, const string& value, const uint flags)
     {
         MDB_val key_accessor;
         key_accessor.mv_size = key.size();
@@ -757,26 +741,9 @@ namespace Q
         
         int retval = mdb_put(txn, dbi, &key_accessor, &value_accessor, flags);
         if (0 != retval) throw QException("mdb_put failed " + string(mdb_strerror(retval)));
-        
-        /*
-        Dbt key_accessor((void*)key.c_str(), (uint)key.size()+1);
-        Dbt value_accessor((void*)value.c_str(), (uint)value.size());
-        
-        switch (int ret = db->put(NULL, &key_accessor, &value_accessor, flags))
-        {
-            case 0:
-                //q_log("berkeley put: [%s] key stored", key.c_str());
-                break;
-            case DB_KEYEXIST:
-                q_log("berkeley put: [%s] key already exists", key.c_str());
-                break;
-            default:
-                q_error("berkeley put: unknown error");
-        }
-        */
     }
     
-    void LMDBQ::delete_record(MDB_txn* txn, MDB_dbi dbi, const string& key)
+    void delete_record(MDB_txn* txn, MDB_dbi dbi, const string& key)
     {
         MDB_val key_accessor;        
         key_accessor.mv_size = key.size();
@@ -785,22 +752,6 @@ namespace Q
         int retval = mdb_del(txn, dbi, &key_accessor, NULL);
         if (MDB_NOTFOUND == retval) return;
         if (0 != retval) throw QException("mdb_del failed " + string(mdb_strerror(retval)));
-        
-        /*
-        Dbt key_accessor((void*)key.c_str(), (uint)key.size()+1);
-        
-        switch (int ret = db->del(NULL, &key_accessor, flags))
-        {
-            case 0:
-                //q_log("berkeley del: [%s] key deleted", key.c_str());
-                break;
-            case DB_NOTFOUND:
-                q_log("berkeley del: [%s] key not found", key.c_str());
-                break;
-            default:
-                q_error("berkeley del: unknown error");
-        }
-        */
     }
     
     string encode_queue(const vector<string> data)
@@ -848,7 +799,15 @@ namespace Q
     
     LMDBConfig parse_config(const Json::Value& configuration)
     {
+        bool transient = 0 == strcmp("true", configuration.get("transient", "true").asString().c_str());
         string path = configuration.get("path", "").asString();
-        return LMDBConfig(path);
+        if (path.empty())
+        {
+            const char* dir = getenv("TMPDIR");
+            path = 0 != dir ? dir : "/tmp";
+        }
+        path += "/qlibdb";
+        
+        return LMDBConfig(transient, path);
     }
 }
