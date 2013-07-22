@@ -6,11 +6,10 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 src/core \
-src/backends \
-src/3rd-party/json
+src/backends
 
 # ideally we would link hiredis, lmdb statically but not their makefile is not osx compliant
-noinst_LTLIBRARIES = libhiredis.la liblmdb.la
+noinst_LTLIBRARIES = libhiredis.la liblmdb.la libjson.la
 
 libhiredis_la_SOURCES = \
 src/3rd-party/hiredis/fmacros.h \
@@ -24,6 +23,23 @@ liblmdb_la_SOURCES = \
 src/3rd-party/mdb/libraries/liblmdb/midl.h src/3rd-party/mdb/libraries/liblmdb/midl.c \
 src/3rd-party/mdb/libraries/liblmdb/lmdb.h src/3rd-party/mdb/libraries/liblmdb/mdb.c
 
+libjson_la_SOURCES = \
+src/3rd-party/json/autolink.h \
+src/3rd-party/json/config.h \
+src/3rd-party/json/features.h \
+src/3rd-party/json/forwards.h \
+src/3rd-party/json/json_batchallocator.h \
+src/3rd-party/json/json_internalarray.inl \
+src/3rd-party/json/json_internalmap.inl \
+src/3rd-party/json/json_reader.cpp \
+src/3rd-party/json/json_value.cpp \
+src/3rd-party/json/json_valueiterator.inl \
+src/3rd-party/json/json_writer.cpp \
+src/3rd-party/json/json.h \
+src/3rd-party/json/reader.h \
+src/3rd-party/json/value.h \
+src/3rd-party/json/writer.h
+
 lib_LTLIBRARIES = libq-@Q_API_VERSION@.la
 libq_@Q_API_VERSION@_la_SOURCES =
 
@@ -32,9 +48,9 @@ nodist_EXTRA_libq_@Q_API_VERSION@_la_SOURCES = dummy.cpp
 libq_@Q_API_VERSION@_la_LIBADD = \
 src/core/libcore.la \
 src/backends/libbackends.la \
-src/3rd-party/json/libjson.la \
 libhiredis.la \
-liblmdb.la
+liblmdb.la \
+libjson.la
 
 libq_@Q_API_VERSION@_la_LDFLAGS = -version-info $(Q_SO_VERSION)
 
