@@ -7,8 +7,8 @@
 
 /* Header for class com_mishlabs_q_Q */
 
-#ifndef _Included_com_mishlabs_q_Q
-#define _Included_com_mishlabs_q_Q
+#ifndef __q__QlibJava__
+#define __q__QlibJava__
 
 extern "C"
 {
@@ -93,6 +93,6 @@ extern "C"
     (JNIEnv *, jobject, jlong);
 
 }
-#endif
+#endif /* defined(__q__QlibJava__) */
 
-#endif
+#endif /*JNI_HEADER*/

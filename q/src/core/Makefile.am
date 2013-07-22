@@ -5,4 +5,5 @@ JobError.h JobError.cpp \
 Logger.h Logger.cpp \
 Q.h Q.cpp \
 QFactory.h QFactory.cpp \
-Qlib.h Qlib.cpp
+Qlib.h Qlib.cpp \
+QlibJava.h QlibJava.cpp
