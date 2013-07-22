@@ -11,7 +11,6 @@
 #include <sstream>
 #include <algorithm>
 #include <cstdarg>
-#include <string.h> 
 
 #include "../core/JobCodec.h"
 #include "../core/Logger.h"
@@ -798,7 +797,7 @@ namespace Q
     
     LMDBConfig parse_config(const Json::Value& configuration)
     {
-        bool transient = 0 == strcmp("true", configuration.get("transient", "true").asString().c_str());
+        bool transient = 0 == configuration.get("transient", "true").asString().compare("true");
         string path = configuration.get("path", "").asString();
         if (path.empty())
         {
