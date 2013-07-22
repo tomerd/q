@@ -21,7 +21,7 @@
 //#endif
 //#include "../backends/KyotoCabinetQ.h"
 
-#include "../backends/lmdbQ.h"
+#include "../backends/LMDBQ.h"
 #include "../backends/RedisQ.h"
 
 namespace Q

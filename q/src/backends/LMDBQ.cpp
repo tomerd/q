@@ -8,8 +8,6 @@
 
 #include "LMDBQ.h"
 
-#include "LMDBQ.h"
-
 #include <sstream>
 #include <algorithm>
 #include <cstdarg>
