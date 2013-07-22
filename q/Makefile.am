@@ -7,9 +7,22 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = \
 src/core \
 src/backends \
-src/3rd-party/json \
-src/3rd-party/hiredis \
-src/3rd-party/mdb/libraries/liblmdb
+src/3rd-party/json
+
+# ideally we would link hiredis, lmdb statically but not their makefile is not osx compliant
+noinst_LTLIBRARIES = libhiredis.la liblmdb.la
+
+libhiredis_la_SOURCES = \
+src/3rd-party/hiredis/fmacros.h \
+src/3rd-party/hiredis/async.h src/3rd-party/hiredis/async.c \
+src/3rd-party/hiredis/dict.h src/3rd-party/hiredis/dict.c \
+src/3rd-party/hiredis/hiredis.h src/3rd-party/hiredis/hiredis.c \
+src/3rd-party/hiredis/net.h src/3rd-party/hiredis/net.c \
+src/3rd-party/hiredis/sds.h src/3rd-party/hiredis/sds.c
+
+liblmdb_la_SOURCES = \
+src/3rd-party/mdb/libraries/liblmdb/midl.h src/3rd-party/mdb/libraries/liblmdb/midl.c \
+src/3rd-party/mdb/libraries/liblmdb/lmdb.h src/3rd-party/mdb/libraries/liblmdb/mdb.c
 
 lib_LTLIBRARIES = libq-@Q_API_VERSION@.la
 libq_@Q_API_VERSION@_la_SOURCES =
@@ -20,8 +33,8 @@ libq_@Q_API_VERSION@_la_LIBADD = \
 src/core/libcore.la \
 src/backends/libbackends.la \
 src/3rd-party/json/libjson.la \
-src/3rd-party/hiredis/libhiredis.a \
-src/3rd-party/mdb/libraries/liblmdb/liblmdb.a
+libhiredis.la \
+liblmdb.la
 
 libq_@Q_API_VERSION@_la_LDFLAGS = -version-info $(Q_SO_VERSION)
 
