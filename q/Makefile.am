@@ -8,7 +8,7 @@ SUBDIRS = \
 src/core \
 src/backends
 
-# ideally we would link hiredis, lmdb statically but not their makefile is not osx compliant
+# ideally we would link hiredis, lmdb, json statically but not their makefiles are not osx compliant
 noinst_LTLIBRARIES = libhiredis.la liblmdb.la libjson.la
 
 libhiredis_la_SOURCES = \
