@@ -81,6 +81,5 @@ AC_SUBST([Q_SO_VERSION], [1:0:0])
 AC_CONFIG_FILES([Makefile
 				 src/core/Makefile
 				 src/backends/Makefile
-				 src/3rd-party/json/Makefile
                  q-${Q_API_VERSION}.pc:q.pc.in])
 AC_OUTPUT
