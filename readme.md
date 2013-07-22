@@ -14,7 +14,7 @@ where such are not required. you can think of it as an ORM for queueing.
 q runs on multiple back-ends and has bindings to many programing languages. and so, while during development you will most likely run it in-memory and let it clear when the process dies, you may choose a redis back-end on your test environment and running dedicated servers backed by rabbitMQ, amazon SQS or some other enterprise queueing system on production.
 
 ##### back-ends support
-* lmdb (default): designed for a single machine, can be configured to run non persistent, in memory (useful for development mode) or persistent.
+* lmdb (default): designed for a single machine, single or multiple processes. can be configured to run on both non persistent (very useful for development) or persistent mode.
 * redis
 
 ##### languages support
