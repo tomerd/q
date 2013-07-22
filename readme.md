@@ -14,17 +14,20 @@ where such are not required. you can think of it as an ORM for queueing.
 q runs on multiple back-ends and has bindings to many programing languages. and so, while during development you will most likely run it in-memory and let it clear when the process dies, you may choose a redis back-end on your test environment and running dedicated servers backed by rabbitMQ, amazon SQS or some other enterprise queueing system on production.
 
 ##### back-ends support
-* lmdb (default): designed for a single machine, single or multiple processes. can be configured to run on both non persistent (very useful for development) or persistent mode.
-* redis
+* [lmdb] [101] (default): designed for a single machine, single or multiple processes. can be configured to run on both non persistent (very useful for development) or persistent mode.
+* [redis] [102]
+
+  [101]: http://symas.com/mdb/        "lmdb"
+  [102]: http://redis.io/             "redis"
 
 ##### languages support
-* [ruby] [1]
-* [node.js] [2]
-* [java/scala] [3]
+* [ruby] [201]
+* [node.js] [202]
+* [java/scala] [203]
 
-  [1]: https://github.com/tomerd/q-ruby-binding        "ruby"
-  [2]: https://github.com/tomerd/q-node-binding        "node.js"
-  [3]: https://github.com/tomerd/q-java-binding        "java/scala"
+  [201]: https://github.com/tomerd/q-ruby-binding        "ruby"
+  [202]: https://github.com/tomerd/q-node-binding        "node.js"
+  [203]: https://github.com/tomerd/q-java-binding        "java/scala"
 
 ##### installing on osx/linux
 dependencies: libuuid-devel
