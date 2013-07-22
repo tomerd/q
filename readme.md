@@ -39,7 +39,7 @@ dependencies: libuuid-devel
 	git submodule update
 	
 	cd q
-	aclocal && autoreconf -i && automake
+	autoreconf -i && automake
 	./configure
 	make && make install
 
